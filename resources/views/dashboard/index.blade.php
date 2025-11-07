@@ -25,6 +25,41 @@
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
 
+    /* Tabs personalizados */
+    .nav-tabs-custom {
+        background: white;
+        border-radius: 1rem;
+        padding: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .nav-tabs-custom .nav-link {
+        border: none;
+        color: #6b7280;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        margin: 0 0.25rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs-custom .nav-link:hover {
+        background: #f3f4f6;
+        color: var(--primary-color);
+    }
+
+    .nav-tabs-custom .nav-link.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .nav-tabs-custom .nav-link i {
+        margin-right: 0.5rem;
+    }
+
     .metric-card {
         background: white;
         border-radius: 1rem;
@@ -61,26 +96,6 @@
     .metric-icon.compras { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
     .metric-icon.clientes { background: rgba(59, 130, 246, 0.1); color: var(--primary-color); }
     .metric-icon.stock { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
-
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--dark-color);
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 3px solid #e5e7eb;
-        position: relative;
-    }
-
-    .section-title::before {
-        content: '';
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(to right, var(--primary-color), var(--success-color));
-    }
 
     .chart-card {
         background: white;
@@ -131,6 +146,10 @@
         height: 60px !important;
     }
 
+    .tab-content {
+        min-height: 500px;
+    }
+
     @media (max-width: 768px) {
         .dashboard-header {
             padding: 1.5rem;
@@ -138,6 +157,11 @@
 
         .metric-card {
             margin-bottom: 1rem;
+        }
+
+        .nav-tabs-custom .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
         }
     }
 </style>
@@ -162,322 +186,461 @@
         </div>
     </div>
 
-    <!-- Métricas Principales -->
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="metric-card ventas">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <p class="text-muted mb-1 small">Ventas Hoy</p>
-                        <h3 class="mb-0 fw-bold">Gs. {{ number_format($ventasHoy, 0, ',', '.') }}</h3>
-                    </div>
-                    <div class="metric-icon ventas">
-                        <i class="fas fa-cash-register"></i>
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs nav-tabs-custom" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
+                <i class="fas fa-home"></i>Vista General
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ventas-tab" data-bs-toggle="tab" data-bs-target="#ventas" type="button" role="tab">
+                <i class="fas fa-shopping-cart"></i>Ventas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="inventario-tab" data-bs-toggle="tab" data-bs-target="#inventario" type="button" role="tab">
+                <i class="fas fa-warehouse"></i>Inventario
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="compras-tab" data-bs-toggle="tab" data-bs-target="#compras" type="button" role="tab">
+                <i class="fas fa-truck"></i>Compras
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="dashboardTabsContent">
+
+        <!-- ==================== VISTA GENERAL ==================== -->
+        <div class="tab-pane fade show active" id="general" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <!-- Métrica Ventas Hoy -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="metric-card ventas">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <p class="text-muted mb-1 small">Ventas Hoy</p>
+                                <h3 class="mb-0 fw-bold">Gs. {{ number_format($ventasHoy, 0, ',', '.') }}</h3>
+                            </div>
+                            <div class="metric-icon ventas">
+                                <i class="fas fa-cash-register"></i>
+                            </div>
+                        </div>
+                        <canvas id="ventasHoyChart" class="mini-chart"></canvas>
                     </div>
                 </div>
-                <canvas id="ventasHoyChart" class="mini-chart"></canvas>
+
+                <!-- Métrica Ventas del Mes -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="metric-card ventas">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <p class="text-muted mb-1 small">Ventas del Mes</p>
+                                <h3 class="mb-0 fw-bold">Gs. {{ number_format($ventasMes, 0, ',', '.') }}</h3>
+                                @if($crecimientoVentas != 0)
+                                    <span class="badge-growth {{ $crecimientoVentas > 0 ? 'positive' : 'negative' }}">
+                                        <i class="fas fa-arrow-{{ $crecimientoVentas > 0 ? 'up' : 'down' }}"></i>
+                                        {{ number_format(abs($crecimientoVentas), 1) }}%
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="metric-icon ventas">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Métrica Productos -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="metric-card inventario">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <p class="text-muted mb-1 small">Productos</p>
+                                <h3 class="mb-0 fw-bold">{{ $totalProductos }}</h3>
+                                <small class="text-muted">Valor: Gs. {{ number_format($valorInventario, 0, ',', '.') }}</small>
+                            </div>
+                            <div class="metric-icon inventario">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                        </div>
+                        <canvas id="productosChart" class="mini-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Métrica Stock Bajo -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="metric-card stock">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <p class="text-muted mb-1 small">Stock Bajo</p>
+                                <h3 class="mb-0 fw-bold text-danger">{{ $stockBajo }}</h3>
+                                <small class="text-muted">Productos críticos</small>
+                            </div>
+                            <div class="metric-icon stock">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen Gráfico General -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="chart-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-area me-2"></i>Resumen de Ventas {{ date('Y') }}</h6>
+                        <canvas id="ventasGeneralChart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-bar me-2"></i>Resumen de Compras {{ date('Y') }}</h6>
+                        <canvas id="comprasGeneralChart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="metric-card ventas">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <p class="text-muted mb-1 small">Ventas del Mes</p>
-                        <h3 class="mb-0 fw-bold">Gs. {{ number_format($ventasMes, 0, ',', '.') }}</h3>
-                        @if($crecimientoVentas != 0)
-                            <span class="badge-growth {{ $crecimientoVentas > 0 ? 'positive' : 'negative' }}">
-                                <i class="fas fa-arrow-{{ $crecimientoVentas > 0 ? 'up' : 'down' }}"></i>
-                                {{ number_format(abs($crecimientoVentas), 1) }}%
-                            </span>
-                        @endif
+        <!-- ==================== VENTAS ==================== -->
+        <div class="tab-pane fade" id="ventas" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="chart-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-line me-2"></i>Ventas Mensuales {{ date('Y') }}</h6>
+                        <canvas id="ventasAnualesChart" style="height: 350px;"></canvas>
                     </div>
-                    <div class="metric-icon ventas">
-                        <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="col-lg-4">
+                    <div class="metric-card ventas mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Ventas Hoy</p>
+                                <h3 class="mb-0 fw-bold text-success">Gs. {{ number_format($ventasHoy, 0, ',', '.') }}</h3>
+                            </div>
+                            <div class="metric-icon ventas">
+                                <i class="fas fa-cash-register"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="metric-card ventas">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Ventas del Mes</p>
+                                <h3 class="mb-0 fw-bold text-success">Gs. {{ number_format($ventasMes, 0, ',', '.') }}</h3>
+                                @if($crecimientoVentas != 0)
+                                    <span class="badge-growth {{ $crecimientoVentas > 0 ? 'positive' : 'negative' }} mt-2">
+                                        <i class="fas fa-arrow-{{ $crecimientoVentas > 0 ? 'up' : 'down' }}"></i>
+                                        {{ number_format(abs($crecimientoVentas), 1) }}% vs mes anterior
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="metric-icon ventas">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="table-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-users me-2"></i>Últimos Clientes</h6>
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Última Compra</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($ultimosClientes as $uc)
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-user-circle text-primary me-2"></i>
+                                            <strong>{{ $uc->cliente->cli_nombre }} {{ $uc->cliente->cli_apellido }}</strong>
+                                        </td>
+                                        <td><small class="text-muted">{{ \Carbon\Carbon::parse($uc->ultima_compra)->format('d/m/Y') }}</small></td>
+                                        <td class="text-success fw-bold">Gs. {{ number_format($uc->total_compras, 0, ',', '.') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-3x mb-2 d-block opacity-50"></i>
+                                            No hay datos de clientes
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="table-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-pie me-2"></i>Ventas por Período</h6>
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                <div>
+                                    <p class="mb-1 text-muted small">Hoy</p>
+                                    <h5 class="mb-0 fw-bold">Gs. {{ number_format($ventasHoy, 0, ',', '.') }}</h5>
+                                </div>
+                                <i class="fas fa-calendar-day fa-2x text-primary opacity-50"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                <div>
+                                    <p class="mb-1 text-muted small">Este Mes</p>
+                                    <h5 class="mb-0 fw-bold">Gs. {{ number_format($ventasMes, 0, ',', '.') }}</h5>
+                                </div>
+                                <i class="fas fa-calendar-week fa-2x text-success opacity-50"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1 text-muted small">Mes Anterior</p>
+                                    <h5 class="mb-0 fw-bold">Gs. {{ number_format($ventasMesAnterior, 0, ',', '.') }}</h5>
+                                </div>
+                                <i class="fas fa-calendar-alt fa-2x text-info opacity-50"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="metric-card inventario">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <p class="text-muted mb-1 small">Productos</p>
-                        <h3 class="mb-0 fw-bold">{{ $totalProductos }}</h3>
-                        <small class="text-muted">Valor: Gs. {{ number_format($valorInventario, 0, ',', '.') }}</small>
-                    </div>
-                    <div class="metric-icon inventario">
-                        <i class="fas fa-boxes"></i>
+        <!-- ==================== INVENTARIO ==================== -->
+        <div class="tab-pane fade" id="inventario" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="metric-card inventario">
+                        <div class="text-center">
+                            <div class="metric-icon inventario mx-auto mb-3">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <h3 class="fw-bold mb-1">{{ $totalProductos }}</h3>
+                            <p class="text-muted mb-0 small">Total Productos</p>
+                        </div>
                     </div>
                 </div>
-                <canvas id="productosChart" class="mini-chart"></canvas>
+                <div class="col-md-3">
+                    <div class="metric-card stock">
+                        <div class="text-center">
+                            <div class="metric-icon stock mx-auto mb-3">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3 class="fw-bold mb-1 text-danger">{{ $stockBajo }}</h3>
+                            <p class="text-muted mb-0 small">Stock Bajo</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="metric-card inventario">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Valor Total del Inventario</p>
+                                <h3 class="mb-0 fw-bold text-info">Gs. {{ number_format($valorInventario, 0, ',', '.') }}</h3>
+                                <small class="text-muted">Basado en precio de compra</small>
+                            </div>
+                            <div class="metric-icon inventario">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="table-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-exclamation-circle text-danger me-2"></i>Productos con Stock Bajo</h6>
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Stock</th>
+                                    <th>Mínimo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($productosStockBajo as $p)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $p->pro_nombre }}</strong><br>
+                                            <small class="text-muted">{{ $p->pro_codigo }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ $p->pro_stock }}</span>
+                                        </td>
+                                        <td>{{ $p->pro_stock_minimo }}</td>
+                                        <td>
+                                            <i class="fas fa-exclamation-circle text-danger"></i>
+                                            Crítico
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="fas fa-check-circle fa-3x mb-2 d-block text-success opacity-50"></i>
+                                            Stock en niveles normales
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="table-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-trophy text-warning me-2"></i>Productos Más Vendidos</h6>
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad Vendida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($productosMasVendidos as $index => $pv)
+                                    <tr>
+                                        <td>
+                                            <span class="badge {{ $index == 0 ? 'bg-warning' : ($index == 1 ? 'bg-secondary' : 'bg-info') }}">
+                                                {{ $index + 1 }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ $pv->producto->pro_nombre }}</strong><br>
+                                            <small class="text-muted">{{ $pv->producto->pro_codigo }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">{{ $pv->total_vendido }} {{ $pv->producto->pro_unidad_medida }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-3x mb-2 d-block opacity-50"></i>
+                                            No hay ventas registradas
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="metric-card stock">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <p class="text-muted mb-1 small">Stock Bajo</p>
-                        <h3 class="mb-0 fw-bold text-danger">{{ $stockBajo }}</h3>
-                        <small class="text-muted">Productos críticos</small>
+        <!-- ==================== COMPRAS ==================== -->
+        <div class="tab-pane fade" id="compras" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="chart-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-bar me-2"></i>Gastos Mensuales en Compras {{ date('Y') }}</h6>
+                        <canvas id="comprasMensualesChart" style="height: 350px;"></canvas>
                     </div>
-                    <div class="metric-icon stock">
-                        <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="col-lg-4">
+                    <div class="metric-card compras mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Gastos del Mes</p>
+                                <h3 class="mb-0 fw-bold text-warning">Gs. {{ number_format($gastosMes, 0, ',', '.') }}</h3>
+                            </div>
+                            <div class="metric-icon compras">
+                                <i class="fas fa-shopping-basket"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="metric-card clientes">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Proveedores Activos</p>
+                                <h3 class="mb-0 fw-bold text-primary">{{ $totalProveedores }}</h3>
+                                <small class="text-muted">Nuevos clientes: {{ $nuevosClientes }}</small>
+                            </div>
+                            <div class="metric-icon clientes">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- SECCIÓN VENTAS -->
-    <h5 class="section-title">
-        <i class="fas fa-shopping-cart me-2"></i>Análisis de Ventas
-    </h5>
-    <div class="row g-4 mb-4">
-        <div class="col-lg-8">
-            <div class="chart-card">
-                <h6 class="fw-semibold mb-3">Ventas Anuales {{ date('Y') }}</h6>
-                <canvas id="ventasAnualesChart" style="height: 300px;"></canvas>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="table-card">
-                <h6 class="fw-semibold mb-3">Últimos Clientes</h6>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($ultimosClientes as $uc)
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="table-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-building text-warning me-2"></i>Proveedores - Mayor Gasto</h6>
+                        <table class="table table-hover">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>
-                                        <i class="fas fa-user-circle text-primary me-2"></i>
-                                        <strong>{{ $uc->cliente->cli_nombre }} {{ $uc->cliente->cli_apellido }}</strong><br>
-                                        <small class="text-muted">{{ \Carbon\Carbon::parse($uc->ultima_compra)->format('d/m/Y') }}</small>
-                                    </td>
-                                    <td class="text-success fw-bold">Gs. {{ number_format($uc->total_compras, 0, ',', '.') }}</td>
+                                    <th>Proveedor</th>
+                                    <th>Total Gastado</th>
                                 </tr>
-                            @empty
+                            </thead>
+                            <tbody>
+                                @forelse($topProveedoresGasto as $pg)
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-building text-warning me-2"></i>
+                                            <strong>{{ $pg->proveedor->prov_nombre }}</strong><br>
+                                            <small class="text-muted">{{ $pg->proveedor->prov_ciudad }}</small>
+                                        </td>
+                                        <td class="text-danger fw-bold">Gs. {{ number_format($pg->total_gastado, 0, ',', '.') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-3x mb-2 d-block opacity-50"></i>
+                                            No hay compras registradas
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="table-card">
+                        <h6 class="fw-semibold mb-3"><i class="fas fa-store text-success me-2"></i>Proveedores - Precios Más Económicos</h6>
+                        <table class="table table-hover">
+                            <thead class="table-light">
                                 <tr>
-                                    <td colspan="2" class="text-center text-muted">
-                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                                        No hay datos
-                                    </td>
+                                    <th>Producto</th>
+                                    <th>Proveedor</th>
+                                    <th>Precio Prom.</th>
                                 </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse($proveedoresEconomicos as $pe)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $pe->producto->pro_nombre ?? 'N/A' }}</strong>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-store text-success me-1"></i>
+                                            {{ $pe->compra->proveedor->prov_nombre ?? 'N/A' }}
+                                        </td>
+                                        <td class="text-success fw-bold">Gs. {{ number_format($pe->precio_promedio, 0, ',', '.') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-3x mb-2 d-block opacity-50"></i>
+                                            No hay datos de comparación
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- SECCIÓN INVENTARIO -->
-    <h5 class="section-title">
-        <i class="fas fa-warehouse me-2"></i>Gestión de Inventario
-    </h5>
-    <div class="row g-4 mb-4">
-        <div class="col-lg-6">
-            <div class="table-card">
-                <h6 class="fw-semibold mb-3">Productos con Stock Bajo</h6>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Producto</th>
-                                <th>Stock</th>
-                                <th>Mínimo</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($productosStockBajo as $p)
-                                <tr>
-                                    <td>
-                                        <strong>{{ $p->pro_nombre }}</strong><br>
-                                        <small class="text-muted">{{ $p->pro_codigo }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-danger">{{ $p->pro_stock }}</span>
-                                    </td>
-                                    <td>{{ $p->pro_stock_minimo }}</td>
-                                    <td>
-                                        <i class="fas fa-exclamation-circle text-danger"></i>
-                                        Crítico
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">
-                                        <i class="fas fa-check-circle fa-2x mb-2 d-block text-success"></i>
-                                        Stock en niveles normales
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="table-card">
-                <h6 class="fw-semibold mb-3">Productos Más Vendidos</h6>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($productosMasVendidos as $index => $pv)
-                                <tr>
-                                    <td>
-                                        <span class="badge {{ $index == 0 ? 'bg-warning' : ($index == 1 ? 'bg-secondary' : 'bg-info') }}">
-                                            {{ $index + 1 }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <strong>{{ $pv->producto->pro_nombre }}</strong><br>
-                                        <small class="text-muted">{{ $pv->producto->pro_codigo }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-success">{{ $pv->total_vendido }} {{ $pv->producto->pro_unidad_medida }}</span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">
-                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                                        No hay ventas registradas
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SECCIÓN COMPRAS -->
-    <h5 class="section-title">
-        <i class="fas fa-truck me-2"></i>Análisis de Compras
-    </h5>
-    <div class="row g-4 mb-4">
-        <div class="col-lg-8">
-            <div class="chart-card">
-                <h6 class="fw-semibold mb-3">Gastos Mensuales en Compras {{ date('Y') }}</h6>
-                <canvas id="comprasChart" style="height: 300px;"></canvas>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="metric-card compras mb-3">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <p class="text-muted mb-1 small">Gastos del Mes</p>
-                        <h3 class="mb-0 fw-bold text-warning">Gs. {{ number_format($gastosMes, 0, ',', '.') }}</h3>
-                    </div>
-                    <div class="metric-icon compras">
-                        <i class="fas fa-shopping-basket"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="metric-card clientes">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <p class="text-muted mb-1 small">Proveedores Activos</p>
-                        <h3 class="mb-0 fw-bold text-primary">{{ $totalProveedores }}</h3>
-                        <small class="text-muted">Nuevos clientes: {{ $nuevosClientes }}</small>
-                    </div>
-                    <div class="metric-icon clientes">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-lg-6">
-            <div class="table-card">
-                <h6 class="fw-semibold mb-3">Proveedores - Mayor Gasto</h6>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Proveedor</th>
-                                <th>Total Gastado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($topProveedoresGasto as $pg)
-                                <tr>
-                                    <td>
-                                        <i class="fas fa-building text-warning me-2"></i>
-                                        <strong>{{ $pg->proveedor->prov_nombre }}</strong><br>
-                                        <small class="text-muted">{{ $pg->proveedor->prov_ciudad }}</small>
-                                    </td>
-                                    <td class="text-danger fw-bold">Gs. {{ number_format($pg->total_gastado, 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="2" class="text-center text-muted">
-                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                                        No hay compras registradas
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="table-card">
-                <h6 class="fw-semibold mb-3">Proveedores - Precios Más Económicos</h6>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Producto</th>
-                                <th>Proveedor</th>
-                                <th>Precio Prom.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($proveedoresEconomicos as $pe)
-                                <tr>
-                                    <td>
-                                        <strong>{{ $pe->producto->pro_nombre ?? 'N/A' }}</strong>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-store text-success me-1"></i>
-                                        {{ $pe->compra->proveedor->prov_nombre ?? 'N/A' }}
-                                    </td>
-                                    <td class="text-success fw-bold">Gs. {{ number_format($pe->precio_promedio, 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">
-                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                                        No hay datos de comparación
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 
 </div>
@@ -486,11 +649,13 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Configuración común de gráficos
+    // Configuración común
     Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     Chart.defaults.color = '#6b7280';
 
-    // Mini chart - Ventas Hoy (últimos 7 días)
+    // ==================== VISTA GENERAL ====================
+
+    // Mini chart - Ventas Hoy
     new Chart(document.getElementById('ventasHoyChart'), {
         type: 'line',
         data: {
@@ -509,14 +674,11 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: { display: false }
-            }
+            scales: { x: { display: false }, y: { display: false } }
         }
     });
 
-    // Mini chart - Productos (últimos 6 meses)
+    // Mini chart - Productos
     new Chart(document.getElementById('productosChart'), {
         type: 'bar',
         data: {
@@ -531,20 +693,111 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        }
+    });
+
+    // Gráfico Ventas General
+    const ctxVentasGeneral = document.getElementById('ventasGeneralChart');
+    const gradVentas = ctxVentasGeneral.getContext('2d').createLinearGradient(0, 0, 0, 300);
+    gradVentas.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+    gradVentas.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+    new Chart(ctxVentasGeneral, {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            datasets: [{
+                label: 'Ventas (Gs.)',
+                data: @json($ventasAnuales),
+                borderColor: '#10b981',
+                backgroundColor: gradVentas,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    callbacks: {
+                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
+                    }
+                }
+            },
             scales: {
-                x: { display: false },
-                y: { display: false }
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: { grid: { display: false } }
             }
         }
     });
 
-    // Gráfico Ventas Anuales
-    const ctxVentas = document.getElementById('ventasAnualesChart');
-    const gradientVentas = ctxVentas.getContext('2d').createLinearGradient(0, 0, 0, 300);
-    gradientVentas.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-    gradientVentas.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+    // Gráfico Compras General
+    const ctxComprasGeneral = document.getElementById('comprasGeneralChart');
+    const gradCompras = ctxComprasGeneral.getContext('2d').createLinearGradient(0, 0, 0, 300);
+    gradCompras.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+    gradCompras.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
 
-    new Chart(ctxVentas, {
+    new Chart(ctxComprasGeneral, {
+        type: 'bar',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            datasets: [{
+                label: 'Gastos (Gs.)',
+                data: @json($gastosMensuales),
+                backgroundColor: gradCompras,
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    callbacks: {
+                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // ==================== TAB VENTAS ====================
+
+    // Gráfico Ventas Anuales (Tab Ventas)
+    const ctxVentasAnuales = document.getElementById('ventasAnualesChart');
+    const gradVentasTab = ctxVentasAnuales.getContext('2d').createLinearGradient(0, 0, 0, 350);
+    gradVentasTab.addColorStop(0, 'rgba(16, 185, 129, 0.5)');
+    gradVentasTab.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+    new Chart(ctxVentasAnuales, {
         type: 'line',
         data: {
             labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
@@ -552,7 +805,7 @@
                 label: 'Ventas Mensuales (Gs.)',
                 data: @json($ventasAnuales),
                 borderColor: '#10b981',
-                backgroundColor: gradientVentas,
+                backgroundColor: gradVentasTab,
                 borderWidth: 3,
                 fill: true,
                 tension: 0.4,
@@ -567,54 +820,44 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: { font: { weight: 'bold' } }
-                },
+                legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     padding: 12,
                     titleFont: { size: 14 },
                     bodyFont: { size: 13 },
                     callbacks: {
-                        label: function(context) {
-                            return 'Gs. ' + context.parsed.y.toLocaleString('es-PY');
-                        }
+                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
                     }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'Gs. ' + (value / 1000).toFixed(0) + 'K';
-                        }
-                    },
+                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
                     grid: { color: 'rgba(0, 0, 0, 0.05)' }
                 },
-                x: {
-                    grid: { display: false }
-                }
+                x: { grid: { display: false } }
             }
         }
     });
 
-    // Gráfico Compras Mensuales
-    const ctxCompras = document.getElementById('comprasChart');
-    const gradientCompras = ctxCompras.getContext('2d').createLinearGradient(0, 0, 0, 300);
-    gradientCompras.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
-    gradientCompras.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+    // ==================== TAB COMPRAS ====================
 
-    new Chart(ctxCompras, {
+    // Gráfico Compras Mensuales (Tab Compras)
+    const ctxComprasMensuales = document.getElementById('comprasMensualesChart');
+    const gradComprasTab = ctxComprasMensuales.getContext('2d').createLinearGradient(0, 0, 0, 350);
+    gradComprasTab.addColorStop(0, 'rgba(245, 158, 11, 0.5)');
+    gradComprasTab.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+    new Chart(ctxComprasMensuales, {
         type: 'bar',
         data: {
             labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
             datasets: [{
                 label: 'Gastos en Compras (Gs.)',
                 data: @json($gastosMensuales),
-                backgroundColor: gradientCompras,
+                backgroundColor: gradComprasTab,
                 borderColor: '#f59e0b',
                 borderWidth: 2,
                 borderRadius: 8
@@ -624,34 +867,22 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: { font: { weight: 'bold' } }
-                },
+                legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     padding: 12,
                     callbacks: {
-                        label: function(context) {
-                            return 'Gs. ' + context.parsed.y.toLocaleString('es-PY');
-                        }
+                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
                     }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'Gs. ' + (value / 1000).toFixed(0) + 'K';
-                        }
-                    },
+                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
                     grid: { color: 'rgba(0, 0, 0, 0.05)' }
                 },
-                x: {
-                    grid: { display: false }
-                }
+                x: { grid: { display: false } }
             }
         }
     });
