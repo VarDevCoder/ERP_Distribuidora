@@ -89,6 +89,14 @@
     font-weight: 700;
     letter-spacing: 0.5px;
 }
+.card{
+    background: rgba(30, 41, 59, 0.04) !important;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.card-body{
+    background: rgba(30, 41, 59, 0.04);
+}
 </style>
 @stack('styles')
 </head>
