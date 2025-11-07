@@ -4,7 +4,7 @@
 @push('styles')
 <style>
     :root {
-        --primary-color: #dc2626;
+        --primary-color: #2563eb;
         --success-color: #16a34a;
         --warning-color: #ea580c;
         --danger-color: #dc2626;
@@ -23,7 +23,7 @@
         border-radius: 1rem;
         margin-bottom: 2rem;
         box-shadow: 0 10px 30px rgba(30, 41, 59, 0.4);
-        border-left: 5px solid #dc2626;
+        border-left: 5px solid #2563eb;
     }
 
     .nav-tabs-custom {
@@ -51,9 +51,9 @@
     }
 
     .nav-tabs-custom .nav-link.active {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         color: white;
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
     }
 
     .metric-card {
@@ -90,7 +90,7 @@
     .metric-icon.ventas { background: rgba(22, 163, 74, 0.15); color: var(--success-color); }
     .metric-icon.inventario { background: rgba(3, 105, 161, 0.15); color: var(--info-color); }
     .metric-icon.compras { background: rgba(234, 88, 12, 0.15); color: var(--warning-color); }
-    .metric-icon.clientes { background: rgba(220, 38, 38, 0.15); color: var(--primary-color); }
+    .metric-icon.clientes { background: rgba(37, 99, 235, 0.15); color: var(--primary-color); }
     .metric-icon.stock { background: rgba(220, 38, 38, 0.15); color: var(--danger-color); }
 
     .chart-card {

@@ -28,17 +28,17 @@
     margin-bottom: 4px;
 }
 .sidebar a:hover{
-    background-color:rgba(220, 38, 38, 0.15);
+    background-color:rgba(37, 99, 235, 0.15);
     color:#fff;
     text-decoration:none;
     transform:translateX(5px);
-    border-left: 3px solid #dc2626;
+    border-left: 3px solid #2563eb;
 }
 .sidebar .active{
-    background: linear-gradient(90deg, rgba(220, 38, 38, 0.2) 0%, rgba(220, 38, 38, 0.05) 100%);
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.05) 100%);
     color:#fff;
-    border-left: 3px solid #dc2626;
-    box-shadow:0 4px 12px rgba(220, 38, 38, 0.2);
+    border-left: 3px solid #2563eb;
+    box-shadow:0 4px 12px rgba(37, 99, 235, 0.2);
 }
 .sidebar i{margin-right:12px; font-size: 1.1rem;}
 .sidebar .sidebar-header{
@@ -46,8 +46,8 @@
     margin-bottom:1.5rem;
     padding:1.5rem 1rem;
     border-radius:1rem;
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    box-shadow:0 8px 20px rgba(220, 38, 38, 0.3);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow:0 8px 20px rgba(37, 99, 235, 0.3);
 }
 .sidebar .sidebar-header img{
     width:55px;
@@ -74,14 +74,14 @@
     align-items:center;
     box-shadow:0 2px 8px rgba(0,0,0,.08);
     flex-wrap:wrap;
-    border-bottom:3px solid #dc2626;
+    border-bottom:3px solid #2563eb;
 }
 .header-top .logo-title{display:flex;align-items:center;gap:10px;}
 .header-top .logo-title img{
     width:48px;
     height:48px;
     transition:transform .3s ease;
-    filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3));
 }
 .header-top .logo-title img:hover{transform:rotate(360deg) scale(1.1);}
 .header-top .logo-title h5{

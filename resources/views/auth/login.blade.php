@@ -15,23 +15,23 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     }
     .btn-primary {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         transition: all 0.3s ease;
     }
     .btn-primary:hover {
-        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
     }
     .input-field:focus {
-        border-color: #dc2626;
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
     .logo-container {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         border-radius: 50%;
         padding: 1.5rem;
-        box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
     }
 </style>
 </head>
@@ -71,10 +71,10 @@
 
         <div class="flex items-center justify-between text-sm">
             <label class="flex items-center text-gray-600 cursor-pointer">
-                <input type="checkbox" class="mr-2 w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500">
+                <input type="checkbox" class="mr-2 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
                 Recordarme
             </label>
-            <a href="#" class="text-red-600 hover:text-red-700 font-medium">¿Olvidaste tu contraseña?</a>
+            <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">¿Olvidaste tu contraseña?</a>
         </div>
 
         <button type="submit" class="btn-primary w-full text-white font-bold py-3.5 rounded-lg shadow-lg">
