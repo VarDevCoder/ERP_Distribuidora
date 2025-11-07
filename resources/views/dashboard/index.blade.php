@@ -17,12 +17,12 @@
     }
 
     .dashboard-header {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
         color: white;
         padding: 2rem;
         border-radius: 1rem;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(30, 41, 59, 0.4);
+        box-shadow: 0 10px 30px rgba(30, 58, 138, 0.4);
         border-left: 5px solid #2563eb;
     }
 
