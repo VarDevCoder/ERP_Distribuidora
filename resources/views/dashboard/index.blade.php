@@ -681,7 +681,7 @@
     // Configuración común para todos los gráficos
     Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     Chart.defaults.color = '#6b7280';
-    Chart.defaults.animation.duration = 750; // Reducir duración de animación
+    Chart.defaults.animation = false; // Desactivar animaciones para evitar loops infinitos
 
     // ==================== INICIALIZACIÓN AL CARGAR PÁGINA ====================
     document.addEventListener('DOMContentLoaded', function() {
@@ -726,7 +726,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 500 },
+                animation: false,
                 plugins: { legend: { display: false } },
                 scales: { x: { display: false }, y: { display: false } }
             }
@@ -761,7 +761,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 750 },
+                    animation: false,
                     plugins: {
                         legend: { display: true, position: 'top' },
                         tooltip: {
@@ -807,7 +807,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 750 },
+                    animation: false,
                     plugins: {
                         legend: { display: true, position: 'top' },
                         tooltip: {
@@ -883,7 +883,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: { duration: 750 },
+                        animation: false,
                         plugins: {
                             legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
                             tooltip: {
@@ -933,7 +933,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: { duration: 750 },
+                        animation: false,
                         plugins: {
                             legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
                             tooltip: {
