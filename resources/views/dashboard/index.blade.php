@@ -649,242 +649,320 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Configuración común
+    // ==================== GESTIÓN DE INSTANCIAS DE GRÁFICOS ====================
+    // Objeto para almacenar todas las instancias de Chart.js
+    const chartInstances = {};
+
+    // Función para destruir un gráfico existente antes de crear uno nuevo
+    function destroyChart(chartId) {
+        if (chartInstances[chartId]) {
+            chartInstances[chartId].destroy();
+            chartInstances[chartId] = null;
+        }
+    }
+
+    // Función para crear un gráfico de forma segura
+    function createChart(canvasId, config) {
+        // Destruir gráfico existente si existe
+        destroyChart(canvasId);
+
+        // Verificar que el canvas existe
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.warn(`Canvas ${canvasId} no encontrado`);
+            return null;
+        }
+
+        // Crear nueva instancia y almacenarla
+        chartInstances[canvasId] = new Chart(canvas, config);
+        return chartInstances[canvasId];
+    }
+
+    // Configuración común para todos los gráficos
     Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     Chart.defaults.color = '#6b7280';
+    Chart.defaults.animation.duration = 750; // Reducir duración de animación
 
-    // ==================== VISTA GENERAL ====================
+    // ==================== INICIALIZACIÓN AL CARGAR PÁGINA ====================
+    document.addEventListener('DOMContentLoaded', function() {
 
-    // Mini chart - Ventas Hoy
-    new Chart(document.getElementById('ventasHoyChart'), {
-        type: 'line',
-        data: {
-            labels: ['', '', '', '', '', '', ''],
-            datasets: [{
-                data: @json($ventasDiarias),
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true,
-                pointRadius: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { x: { display: false }, y: { display: false } }
-        }
-    });
+        // ==================== VISTA GENERAL (Tab activo por defecto) ====================
 
-    // Mini chart - Productos
-    new Chart(document.getElementById('productosChart'), {
-        type: 'bar',
-        data: {
-            labels: ['', '', '', '', '', ''],
-            datasets: [{
-                data: @json($evolucionProductos),
-                backgroundColor: '#06b6d4',
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { x: { display: false }, y: { display: false } }
-        }
-    });
+        // Mini chart - Ventas Hoy
+        createChart('ventasHoyChart', {
+            type: 'line',
+            data: {
+                labels: ['', '', '', '', '', '', ''],
+                datasets: [{
+                    data: @json($ventasDiarias),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 500 },
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
 
-    // Gráfico Ventas General
-    const ctxVentasGeneral = document.getElementById('ventasGeneralChart');
-    const gradVentas = ctxVentasGeneral.getContext('2d').createLinearGradient(0, 0, 0, 300);
-    gradVentas.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-    gradVentas.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+        // Mini chart - Productos
+        createChart('productosChart', {
+            type: 'bar',
+            data: {
+                labels: ['', '', '', '', '', ''],
+                datasets: [{
+                    data: @json($evolucionProductos),
+                    backgroundColor: '#06b6d4',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 500 },
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
 
-    new Chart(ctxVentasGeneral, {
-        type: 'line',
-        data: {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            datasets: [{
-                label: 'Ventas (Gs.)',
-                data: @json($ventasAnuales),
-                borderColor: '#10b981',
-                backgroundColor: gradVentas,
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#10b981',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: true, position: 'top' },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    callbacks: {
-                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
+        // Gráfico Ventas General
+        const ctxVentasGeneral = document.getElementById('ventasGeneralChart');
+        if (ctxVentasGeneral) {
+            const gradVentas = ctxVentasGeneral.getContext('2d').createLinearGradient(0, 0, 0, 300);
+            gradVentas.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+            gradVentas.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+            createChart('ventasGeneralChart', {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [{
+                        label: 'Ventas (Gs.)',
+                        data: @json($ventasAnuales),
+                        borderColor: '#10b981',
+                        backgroundColor: gradVentas,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 750 },
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: { grid: { display: false } }
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+            });
+        }
+
+        // Gráfico Compras General
+        const ctxComprasGeneral = document.getElementById('comprasGeneralChart');
+        if (ctxComprasGeneral) {
+            const gradCompras = ctxComprasGeneral.getContext('2d').createLinearGradient(0, 0, 0, 300);
+            gradCompras.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+            gradCompras.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+            createChart('comprasGeneralChart', {
+                type: 'bar',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [{
+                        label: 'Gastos (Gs.)',
+                        data: @json($gastosMensuales),
+                        backgroundColor: gradCompras,
+                        borderColor: '#f59e0b',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
                 },
-                x: { grid: { display: false } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 750 },
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // ==================== INICIALIZACIÓN LAZY DE TABS ====================
+
+        // Flags para controlar si los tabs ya fueron inicializados
+        let ventasTabInitialized = false;
+        let comprasTabInitialized = false;
+
+        // Event listener para tabs
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', function (event) {
+                const targetTab = event.target.getAttribute('data-bs-target');
+
+                // Inicializar gráficos solo cuando se muestra el tab
+                if (targetTab === '#ventas' && !ventasTabInitialized) {
+                    initVentasTab();
+                    ventasTabInitialized = true;
+                } else if (targetTab === '#compras' && !comprasTabInitialized) {
+                    initComprasTab();
+                    comprasTabInitialized = true;
+                }
+            });
+        });
+
+        // Función para inicializar tab de Ventas
+        function initVentasTab() {
+            const ctxVentasAnuales = document.getElementById('ventasAnualesChart');
+            if (ctxVentasAnuales && !chartInstances['ventasAnualesChart']) {
+                const gradVentasTab = ctxVentasAnuales.getContext('2d').createLinearGradient(0, 0, 0, 350);
+                gradVentasTab.addColorStop(0, 'rgba(16, 185, 129, 0.5)');
+                gradVentasTab.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+                createChart('ventasAnualesChart', {
+                    type: 'line',
+                    data: {
+                        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                        datasets: [{
+                            label: 'Ventas Mensuales (Gs.)',
+                            data: @json($ventasAnuales),
+                            borderColor: '#10b981',
+                            backgroundColor: gradVentasTab,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 750 },
+                        plugins: {
+                            legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleFont: { size: 14 },
+                                bodyFont: { size: 13 },
+                                callbacks: {
+                                    label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Función para inicializar tab de Compras
+        function initComprasTab() {
+            const ctxComprasMensuales = document.getElementById('comprasMensualesChart');
+            if (ctxComprasMensuales && !chartInstances['comprasMensualesChart']) {
+                const gradComprasTab = ctxComprasMensuales.getContext('2d').createLinearGradient(0, 0, 0, 350);
+                gradComprasTab.addColorStop(0, 'rgba(245, 158, 11, 0.5)');
+                gradComprasTab.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+                createChart('comprasMensualesChart', {
+                    type: 'bar',
+                    data: {
+                        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                        datasets: [{
+                            label: 'Gastos en Compras (Gs.)',
+                            data: @json($gastosMensuales),
+                            backgroundColor: gradComprasTab,
+                            borderColor: '#f59e0b',
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 750 },
+                        plugins: {
+                            legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                callbacks: {
+                                    label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
             }
         }
     });
 
-    // Gráfico Compras General
-    const ctxComprasGeneral = document.getElementById('comprasGeneralChart');
-    const gradCompras = ctxComprasGeneral.getContext('2d').createLinearGradient(0, 0, 0, 300);
-    gradCompras.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
-    gradCompras.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
-
-    new Chart(ctxComprasGeneral, {
-        type: 'bar',
-        data: {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            datasets: [{
-                label: 'Gastos (Gs.)',
-                data: @json($gastosMensuales),
-                backgroundColor: gradCompras,
-                borderColor: '#f59e0b',
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: true, position: 'top' },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    callbacks: {
-                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                },
-                x: { grid: { display: false } }
-            }
-        }
-    });
-
-    // ==================== TAB VENTAS ====================
-
-    // Gráfico Ventas Anuales (Tab Ventas)
-    const ctxVentasAnuales = document.getElementById('ventasAnualesChart');
-    const gradVentasTab = ctxVentasAnuales.getContext('2d').createLinearGradient(0, 0, 0, 350);
-    gradVentasTab.addColorStop(0, 'rgba(16, 185, 129, 0.5)');
-    gradVentasTab.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
-
-    new Chart(ctxVentasAnuales, {
-        type: 'line',
-        data: {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            datasets: [{
-                label: 'Ventas Mensuales (Gs.)',
-                data: @json($ventasAnuales),
-                borderColor: '#10b981',
-                backgroundColor: gradVentasTab,
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#10b981',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    titleFont: { size: 14 },
-                    bodyFont: { size: 13 },
-                    callbacks: {
-                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                },
-                x: { grid: { display: false } }
-            }
-        }
-    });
-
-    // ==================== TAB COMPRAS ====================
-
-    // Gráfico Compras Mensuales (Tab Compras)
-    const ctxComprasMensuales = document.getElementById('comprasMensualesChart');
-    const gradComprasTab = ctxComprasMensuales.getContext('2d').createLinearGradient(0, 0, 0, 350);
-    gradComprasTab.addColorStop(0, 'rgba(245, 158, 11, 0.5)');
-    gradComprasTab.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
-
-    new Chart(ctxComprasMensuales, {
-        type: 'bar',
-        data: {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            datasets: [{
-                label: 'Gastos en Compras (Gs.)',
-                data: @json($gastosMensuales),
-                backgroundColor: gradComprasTab,
-                borderColor: '#f59e0b',
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: true, position: 'top', labels: { font: { weight: 'bold' } } },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    callbacks: {
-                        label: (context) => 'Gs. ' + context.parsed.y.toLocaleString('es-PY')
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: (value) => 'Gs. ' + (value / 1000).toFixed(0) + 'K' },
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                },
-                x: { grid: { display: false } }
-            }
-        }
+    // Limpiar todas las instancias cuando se abandona la página
+    window.addEventListener('beforeunload', function() {
+        Object.keys(chartInstances).forEach(chartId => {
+            destroyChart(chartId);
+        });
     });
 </script>
 @endpush
