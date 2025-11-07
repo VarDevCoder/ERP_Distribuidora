@@ -706,7 +706,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 500 },
+                animation: false,
                 plugins: { legend: { display: false } },
                 scales: { x: { display: false }, y: { display: false } }
             }
