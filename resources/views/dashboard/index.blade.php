@@ -250,13 +250,21 @@
                 <div class="col-lg-6">
                     <div class="chart-card">
                         <h6 class="fw-semibold mb-3"><i class="fas fa-chart-area me-2"></i>Resumen de Ventas {{ date('Y') }}</h6>
-                        <canvas id="ventasGeneralChart" style="height: 300px;"></canvas>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Gráfico temporalmente desactivado para debug
+                        </div>
+                        <pre class="small">{{ json_encode($ventasAnuales, JSON_PRETTY_PRINT) }}</pre>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="chart-card">
                         <h6 class="fw-semibold mb-3"><i class="fas fa-chart-bar me-2"></i>Resumen de Compras {{ date('Y') }}</h6>
-                        <canvas id="comprasGeneralChart" style="height: 300px;"></canvas>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Gráfico temporalmente desactivado para debug
+                        </div>
+                        <pre class="small">{{ json_encode($gastosMensuales, JSON_PRETTY_PRINT) }}</pre>
                     </div>
                 </div>
             </div>
@@ -268,7 +276,10 @@
                 <div class="col-lg-8">
                     <div class="chart-card">
                         <h6 class="fw-semibold mb-3"><i class="fas fa-chart-line me-2"></i>Ventas Mensuales {{ date('Y') }}</h6>
-                        <canvas id="ventasAnualesChart" style="height: 350px;"></canvas>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-wrench me-2"></i>
+                            Gráfico en mantenimiento - Datos mostrados abajo
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -498,7 +509,10 @@
                 <div class="col-lg-8">
                     <div class="chart-card">
                         <h6 class="fw-semibold mb-3"><i class="fas fa-chart-bar me-2"></i>Gastos Mensuales en Compras {{ date('Y') }}</h6>
-                        <canvas id="comprasMensualesChart" style="height: 350px;"></canvas>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-wrench me-2"></i>
+                            Gráfico en mantenimiento - Datos mostrados abajo
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -605,156 +619,10 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-(function() {
-    'use strict';
-
-    // Configuración global
-    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    Chart.defaults.color = '#6b7280';
-    Chart.defaults.animation = false;
-
-    let charts = {};
-
-    function createChart(id, config) {
-        if (charts[id]) {
-            charts[id].destroy();
-        }
-        const canvas = document.getElementById(id);
-        if (canvas) {
-            charts[id] = new Chart(canvas, config);
-        }
-    }
-
-    // Esperar a que el DOM esté listo
-    document.addEventListener('DOMContentLoaded', function() {
-
-        // Gráfico Ventas General
-        createChart('ventasGeneralChart', {
-            type: 'line',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [{
-                    label: 'Ventas (Gs.)',
-                    data: @json($ventasAnuales),
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { callback: value => 'Gs. ' + (value / 1000).toFixed(0) + 'K' }
-                    }
-                }
-            }
-        });
-
-        // Gráfico Compras General
-        createChart('comprasGeneralChart', {
-            type: 'bar',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [{
-                    label: 'Gastos (Gs.)',
-                    data: @json($gastosMensuales),
-                    backgroundColor: 'rgba(245, 158, 11, 0.7)',
-                    borderColor: '#f59e0b',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { callback: value => 'Gs. ' + (value / 1000).toFixed(0) + 'K' }
-                    }
-                }
-            }
-        });
-
-        // Lazy load para tabs
-        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(button => {
-            button.addEventListener('shown.bs.tab', function (e) {
-                const target = e.target.getAttribute('data-bs-target');
-
-                if (target === '#ventas' && !charts['ventasAnualesChart']) {
-                    createChart('ventasAnualesChart', {
-                        type: 'line',
-                        data: {
-                            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                            datasets: [{
-                                label: 'Ventas (Gs.)',
-                                data: @json($ventasAnuales),
-                                borderColor: '#10b981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.3
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: true, position: 'top' }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: { callback: value => 'Gs. ' + (value / 1000).toFixed(0) + 'K' }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                if (target === '#compras' && !charts['comprasMensualesChart']) {
-                    createChart('comprasMensualesChart', {
-                        type: 'bar',
-                        data: {
-                            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                            datasets: [{
-                                label: 'Gastos (Gs.)',
-                                data: @json($gastosMensuales),
-                                backgroundColor: 'rgba(245, 158, 11, 0.7)',
-                                borderColor: '#f59e0b',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: true, position: 'top' }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: { callback: value => 'Gs. ' + (value / 1000).toFixed(0) + 'K' }
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-        });
-    });
-})();
+// GRÁFICOS DESACTIVADOS TEMPORALMENTE PARA DEBUG
+console.log('Dashboard cargado - Gráficos desactivados');
+console.log('Datos ventas:', @json($ventasAnuales));
+console.log('Datos compras:', @json($gastosMensuales));
 </script>
 @endpush
