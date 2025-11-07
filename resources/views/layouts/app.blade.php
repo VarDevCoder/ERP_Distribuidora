@@ -67,7 +67,7 @@
     border-top: 1px solid rgba(255,255,255,0.1);
 }
 .header-top{
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     padding:14px 24px;
     display:flex;
     justify-content:space-between;
