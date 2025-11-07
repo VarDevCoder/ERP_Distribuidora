@@ -1,138 +1,275 @@
 @extends('layouts.app')
-@section('title', 'Dashboard')
+@section('title', 'Dashboard - ERP Distribuidora')
 
 @push('styles')
 <style>
-.metric-card {
-  border-radius: 1rem;
-  transition: transform 0.4s, box-shadow 0.4s;
-  max-height: 160px;
-  overflow: hidden;
-  font-style: italic;
-  background: linear-gradient(135deg, #f3f4f6, #e0f2fe);
-}
+    :root {
+        --primary-color: #3b82f6;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #06b6d4;
+        --dark-color: #1f2937;
+    }
 
-.metric-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.18);
-}
+    body {
+        background: #f3f4f6;
+    }
 
-.metric-card canvas {
-  height: 50px !important;
-  background: rgba(255,255,255,0.1);
-  border-radius: 0.5rem;
-}
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
 
-.table-responsive {
-  max-height: 300px;
-  overflow-y: auto;
-}
+    .metric-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+        border-left: 4px solid;
+        height: 100%;
+    }
 
-.table-hover tbody tr:hover {
-  background: linear-gradient(to right, #f0f9ff, #bae6fd);
-  transform: scale(1.02);
-  transition: all 0.3s ease;
-}
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
 
-.text-green-600 { color: #10b981 !important; }
-.text-blue-600 { color: #3b82f6 !important; }
-.text-indigo-600 { color: #6366f1 !important; }
-.text-red-600 { color: #ef4444 !important; }
+    .metric-card.ventas { border-left-color: var(--success-color); }
+    .metric-card.inventario { border-left-color: var(--info-color); }
+    .metric-card.compras { border-left-color: var(--warning-color); }
+    .metric-card.clientes { border-left-color: var(--primary-color); }
+    .metric-card.stock { border-left-color: var(--danger-color); }
+
+    .metric-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+
+    .metric-icon.ventas { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+    .metric-icon.inventario { background: rgba(6, 182, 212, 0.1); color: var(--info-color); }
+    .metric-icon.compras { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+    .metric-icon.clientes { background: rgba(59, 130, 246, 0.1); color: var(--primary-color); }
+    .metric-icon.stock { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #e5e7eb;
+        position: relative;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(to right, var(--primary-color), var(--success-color));
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: 100%;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .table-card table {
+        margin-bottom: 0;
+    }
+
+    .table-card thead {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+    }
+
+    .badge-growth {
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .badge-growth.positive {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .badge-growth.negative {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .mini-chart {
+        height: 60px !important;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 1.5rem;
+        }
+
+        .metric-card {
+            margin-bottom: 1rem;
+        }
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="container-fluid">
-    <h4 class="mb-3 fw-bold text-gray-700">DASHBOARD</h4>
-    <p class="text-gray-500 mb-4 fst-italic">Resumen general de la distribuidora</p>
+<div class="container-fluid px-4 py-4">
 
-    <!-- Cards con microcharts -->
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card metric-card shadow-sm border-start border-success border-5 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div>
-                        <h6 class="text-gray-500 fw-semibold mb-2"><i class="fas fa-shopping-cart me-1"></i> Ventas Hoy</h6>
-                        <h3 class="text-green-600 fw-bold display-6">Gs. {{ number_format($ventasHoy,0,',','.') }}</h3>
-                    </div>
-                    <i class="fas fa-cart-arrow-down fa-3x text-green-600"></i>
-                </div>
-                <canvas class="micro-chart" id="ventasHoyChart"></canvas>
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-2"><i class="fas fa-chart-line me-2"></i>Dashboard ERP</h2>
+                <p class="mb-0 opacity-90">Bienvenido, {{ $user->usu_nombre }} | {{ \Carbon\Carbon::now()->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</p>
             </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card metric-card shadow-sm border-start border-primary border-5 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div>
-                        <h6 class="text-gray-500 fw-semibold mb-2"><i class="fas fa-boxes me-1"></i> Productos</h6>
-                        <h3 class="text-blue-600 fw-bold display-6">{{ $productos }}</h3>
-                    </div>
-                    <i class="fas fa-box-open fa-3x text-blue-600"></i>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="badge bg-white text-dark px-3 py-2">
+                    <i class="fas fa-clock me-1"></i>
+                    Última actualización: {{ \Carbon\Carbon::now()->format('H:i') }}
                 </div>
-                <canvas class="micro-chart" id="productosChart"></canvas>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card metric-card shadow-sm border-start border-info border-5 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div>
-                        <h6 class="text-gray-500 fw-semibold mb-2"><i class="fas fa-users me-1"></i> Clientes</h6>
-                        <h3 class="text-indigo-600 fw-bold display-6">{{ $clientes }}</h3>
-                    </div>
-                    <i class="fas fa-user-friends fa-3x text-indigo-600"></i>
-                </div>
-                <canvas class="micro-chart" id="clientesChart"></canvas>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card metric-card shadow-sm border-start border-danger border-5 p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div>
-                        <h6 class="text-gray-500 fw-semibold mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Stock Bajo</h6>
-                        <h3 class="text-red-600 fw-bold display-6">{{ $stockBajo }}</h3>
-                    </div>
-                    <i class="fas fa-box fa-3x text-red-600"></i>
-                </div>
-                <canvas class="micro-chart" id="stockChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Dashboard Gráfico y Ventas Recientes -->
-    <div class="row g-3">
-        <div class="col-lg-6 col-md-12">
-            <div class="card p-3 shadow-sm">
-                <h6 class="fw-semibold mb-3"><i class="fas fa-chart-line me-1"></i> Ventas Anuales</h6>
-                <canvas id="ventasChart" style="height:250px; max-height:300px;"></canvas>
+    <!-- Métricas Principales -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card ventas">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Ventas Hoy</p>
+                        <h3 class="mb-0 fw-bold">Gs. {{ number_format($ventasHoy, 0, ',', '.') }}</h3>
+                    </div>
+                    <div class="metric-icon ventas">
+                        <i class="fas fa-cash-register"></i>
+                    </div>
+                </div>
+                <canvas id="ventasHoyChart" class="mini-chart"></canvas>
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-12">
-            <div class="card p-3 shadow-sm">
-                <h6 class="fw-semibold mb-3"><i class="fas fa-receipt me-1"></i> Últimas Ventas</h6>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card ventas">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Ventas del Mes</p>
+                        <h3 class="mb-0 fw-bold">Gs. {{ number_format($ventasMes, 0, ',', '.') }}</h3>
+                        @if($crecimientoVentas != 0)
+                            <span class="badge-growth {{ $crecimientoVentas > 0 ? 'positive' : 'negative' }}">
+                                <i class="fas fa-arrow-{{ $crecimientoVentas > 0 ? 'up' : 'down' }}"></i>
+                                {{ number_format(abs($crecimientoVentas), 1) }}%
+                            </span>
+                        @endif
+                    </div>
+                    <div class="metric-icon ventas">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card inventario">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Productos</p>
+                        <h3 class="mb-0 fw-bold">{{ $totalProductos }}</h3>
+                        <small class="text-muted">Valor: Gs. {{ number_format($valorInventario, 0, ',', '.') }}</small>
+                    </div>
+                    <div class="metric-icon inventario">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                </div>
+                <canvas id="productosChart" class="mini-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card stock">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-muted mb-1 small">Stock Bajo</p>
+                        <h3 class="mb-0 fw-bold text-danger">{{ $stockBajo }}</h3>
+                        <small class="text-muted">Productos críticos</small>
+                    </div>
+                    <div class="metric-icon stock">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN VENTAS -->
+    <h5 class="section-title">
+        <i class="fas fa-shopping-cart me-2"></i>Análisis de Ventas
+    </h5>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="chart-card">
+                <h6 class="fw-semibold mb-3">Ventas Anuales {{ date('Y') }}</h6>
+                <canvas id="ventasAnualesChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="table-card">
+                <h6 class="fw-semibold mb-3">Últimos Clientes</h6>
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
                                 <th>Cliente</th>
-                                <th>Fecha</th>
                                 <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($ventasRecientes as $v)
-                            <tr>
-                                <td><i class="fas fa-user me-1 text-blue-600"></i>{{ $v->cliente->cli_nombre }} {{ $v->cliente->cli_apellido }}</td>
-                                <td>{{ \Carbon\Carbon::parse($v->ven_fecha)->format('d/m/Y') }}</td>
-                                <td class="fw-bold text-success">Gs. {{ number_format($v->ven_total,0,',','.') }}</td>
-                            </tr>
+                            @forelse($ultimosClientes as $uc)
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-user-circle text-primary me-2"></i>
+                                        <strong>{{ $uc->cliente->cli_nombre }} {{ $uc->cliente->cli_apellido }}</strong><br>
+                                        <small class="text-muted">{{ \Carbon\Carbon::parse($uc->ultima_compra)->format('d/m/Y') }}</small>
+                                    </td>
+                                    <td class="text-success fw-bold">Gs. {{ number_format($uc->total_compras, 0, ',', '.') }}</td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="3" class="text-center text-muted">No hay ventas recientes</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                        No hay datos
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -140,72 +277,383 @@
             </div>
         </div>
     </div>
+
+    <!-- SECCIÓN INVENTARIO -->
+    <h5 class="section-title">
+        <i class="fas fa-warehouse me-2"></i>Gestión de Inventario
+    </h5>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="table-card">
+                <h6 class="fw-semibold mb-3">Productos con Stock Bajo</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Stock</th>
+                                <th>Mínimo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($productosStockBajo as $p)
+                                <tr>
+                                    <td>
+                                        <strong>{{ $p->pro_nombre }}</strong><br>
+                                        <small class="text-muted">{{ $p->pro_codigo }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger">{{ $p->pro_stock }}</span>
+                                    </td>
+                                    <td>{{ $p->pro_stock_minimo }}</td>
+                                    <td>
+                                        <i class="fas fa-exclamation-circle text-danger"></i>
+                                        Crítico
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        <i class="fas fa-check-circle fa-2x mb-2 d-block text-success"></i>
+                                        Stock en niveles normales
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="table-card">
+                <h6 class="fw-semibold mb-3">Productos Más Vendidos</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($productosMasVendidos as $index => $pv)
+                                <tr>
+                                    <td>
+                                        <span class="badge {{ $index == 0 ? 'bg-warning' : ($index == 1 ? 'bg-secondary' : 'bg-info') }}">
+                                            {{ $index + 1 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ $pv->producto->pro_nombre }}</strong><br>
+                                        <small class="text-muted">{{ $pv->producto->pro_codigo }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">{{ $pv->total_vendido }} {{ $pv->producto->pro_unidad_medida }}</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                        No hay ventas registradas
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN COMPRAS -->
+    <h5 class="section-title">
+        <i class="fas fa-truck me-2"></i>Análisis de Compras
+    </h5>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="chart-card">
+                <h6 class="fw-semibold mb-3">Gastos Mensuales en Compras {{ date('Y') }}</h6>
+                <canvas id="comprasChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="metric-card compras mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1 small">Gastos del Mes</p>
+                        <h3 class="mb-0 fw-bold text-warning">Gs. {{ number_format($gastosMes, 0, ',', '.') }}</h3>
+                    </div>
+                    <div class="metric-icon compras">
+                        <i class="fas fa-shopping-basket"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="metric-card clientes">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1 small">Proveedores Activos</p>
+                        <h3 class="mb-0 fw-bold text-primary">{{ $totalProveedores }}</h3>
+                        <small class="text-muted">Nuevos clientes: {{ $nuevosClientes }}</small>
+                    </div>
+                    <div class="metric-icon clientes">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="table-card">
+                <h6 class="fw-semibold mb-3">Proveedores - Mayor Gasto</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Proveedor</th>
+                                <th>Total Gastado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($topProveedoresGasto as $pg)
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-building text-warning me-2"></i>
+                                        <strong>{{ $pg->proveedor->prov_nombre }}</strong><br>
+                                        <small class="text-muted">{{ $pg->proveedor->prov_ciudad }}</small>
+                                    </td>
+                                    <td class="text-danger fw-bold">Gs. {{ number_format($pg->total_gastado, 0, ',', '.') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                        No hay compras registradas
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="table-card">
+                <h6 class="fw-semibold mb-3">Proveedores - Precios Más Económicos</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Proveedor</th>
+                                <th>Precio Prom.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($proveedoresEconomicos as $pe)
+                                <tr>
+                                    <td>
+                                        <strong>{{ $pe->producto->pro_nombre ?? 'N/A' }}</strong>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-store text-success me-1"></i>
+                                        {{ $pe->compra->proveedor->prov_nombre ?? 'N/A' }}
+                                    </td>
+                                    <td class="text-success fw-bold">Gs. {{ number_format($pe->precio_promedio, 0, ',', '.') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                        No hay datos de comparación
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-/* Gráfico principal con degradado */
-const ctx = document.getElementById('ventasChart');
-const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
-gradient.addColorStop(0, 'rgba(59,130,246,0.5)');
-gradient.addColorStop(1, 'rgba(37,99,235,0.1)');
+    // Configuración común de gráficos
+    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    Chart.defaults.color = '#6b7280';
 
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-        datasets: [{
-            label: 'Ventas Mensuales',
-            data: @json($ventasAnuales),
-            borderColor: '#2563EB',
-            backgroundColor: gradient,
-            borderWidth: 2,
-            fill: true,
-            tension: 0.3,
-            pointBackgroundColor: '#3b82f6',
-            pointHoverRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'top', labels: { font: { weight: 'bold' } } } },
-        animation: { duration: 1200 }
-    }
-});
-
-/* Microcharts animados */
-function createMicroChart(id, data, color) {
-    const ctx = document.getElementById(id);
-    new Chart(ctx, {
+    // Mini chart - Ventas Hoy (últimos 7 días)
+    new Chart(document.getElementById('ventasHoyChart'), {
         type: 'line',
         data: {
-            labels: ['Ene','Feb','Mar','Abr','May','Jun'],
+            labels: ['', '', '', '', '', '', ''],
             datasets: [{
-                data: data,
-                borderColor: color,
-                backgroundColor: Chart.helpers.color(color).alpha(0.2).rgbString(),
+                data: @json($ventasDiarias),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
                 tension: 0.4,
                 fill: true,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                pointBackgroundColor: color
+                pointRadius: 0
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { x: { display: false }, y: { display: false } }
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            }
         }
     });
-}
 
-createMicroChart('ventasHoyChart', @json($ventasHoyMes), '#10b981');
-createMicroChart('productosChart', @json($productosMes), '#3b82f6');
-createMicroChart('clientesChart', @json($clientesMes), '#6366f1');
-createMicroChart('stockChart', @json($stockMes), '#ef4444');
+    // Mini chart - Productos (últimos 6 meses)
+    new Chart(document.getElementById('productosChart'), {
+        type: 'bar',
+        data: {
+            labels: ['', '', '', '', '', ''],
+            datasets: [{
+                data: @json($evolucionProductos),
+                backgroundColor: '#06b6d4',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            }
+        }
+    });
+
+    // Gráfico Ventas Anuales
+    const ctxVentas = document.getElementById('ventasAnualesChart');
+    const gradientVentas = ctxVentas.getContext('2d').createLinearGradient(0, 0, 0, 300);
+    gradientVentas.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+    gradientVentas.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+    new Chart(ctxVentas, {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            datasets: [{
+                label: 'Ventas Mensuales (Gs.)',
+                data: @json($ventasAnuales),
+                borderColor: '#10b981',
+                backgroundColor: gradientVentas,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { font: { weight: 'bold' } }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 },
+                    callbacks: {
+                        label: function(context) {
+                            return 'Gs. ' + context.parsed.y.toLocaleString('es-PY');
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Gs. ' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    },
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // Gráfico Compras Mensuales
+    const ctxCompras = document.getElementById('comprasChart');
+    const gradientCompras = ctxCompras.getContext('2d').createLinearGradient(0, 0, 0, 300);
+    gradientCompras.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+    gradientCompras.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+    new Chart(ctxCompras, {
+        type: 'bar',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            datasets: [{
+                label: 'Gastos en Compras (Gs.)',
+                data: @json($gastosMensuales),
+                backgroundColor: gradientCompras,
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { font: { weight: 'bold' } }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Gs. ' + context.parsed.y.toLocaleString('es-PY');
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Gs. ' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    },
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
 </script>
 @endpush
