@@ -4,25 +4,26 @@
 @push('styles')
 <style>
     :root {
-        --primary-color: #3b82f6;
-        --success-color: #10b981;
-        --warning-color: #f59e0b;
-        --danger-color: #ef4444;
-        --info-color: #06b6d4;
-        --dark-color: #1f2937;
+        --primary-color: #dc2626;
+        --success-color: #16a34a;
+        --warning-color: #ea580c;
+        --danger-color: #dc2626;
+        --info-color: #0369a1;
+        --dark-color: #1e293b;
     }
 
     body {
-        background: #f3f4f6;
+        background: #f1f5f9;
     }
 
     .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
         color: white;
         padding: 2rem;
         border-radius: 1rem;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 10px 30px rgba(30, 41, 59, 0.4);
+        border-left: 5px solid #dc2626;
     }
 
     .nav-tabs-custom {
@@ -50,9 +51,9 @@
     }
 
     .nav-tabs-custom .nav-link.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         color: white;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
     }
 
     .metric-card {
@@ -86,11 +87,11 @@
         font-size: 1.8rem;
     }
 
-    .metric-icon.ventas { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
-    .metric-icon.inventario { background: rgba(6, 182, 212, 0.1); color: var(--info-color); }
-    .metric-icon.compras { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
-    .metric-icon.clientes { background: rgba(59, 130, 246, 0.1); color: var(--primary-color); }
-    .metric-icon.stock { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+    .metric-icon.ventas { background: rgba(22, 163, 74, 0.15); color: var(--success-color); }
+    .metric-icon.inventario { background: rgba(3, 105, 161, 0.15); color: var(--info-color); }
+    .metric-icon.compras { background: rgba(234, 88, 12, 0.15); color: var(--warning-color); }
+    .metric-icon.clientes { background: rgba(220, 38, 38, 0.15); color: var(--primary-color); }
+    .metric-icon.stock { background: rgba(220, 38, 38, 0.15); color: var(--danger-color); }
 
     .chart-card {
         background: white;

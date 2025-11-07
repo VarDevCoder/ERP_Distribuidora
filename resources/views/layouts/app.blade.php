@@ -9,19 +9,86 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 <style>
-.sidebar{background-color:#1D4ED8;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between}
-.sidebar a{color:#fff;font-weight:500;display:flex;align-items:center;padding:12px 20px;border-radius:.5rem;transition:all .3s ease;font-style:italic}
-.sidebar a:hover{background-color:#2563EB;text-decoration:none;transform:translateX(5px)}
-.sidebar .active{background-color:#2563EB;box-shadow:0 0 10px rgba(255,255,255,.3)}
-.sidebar i{margin-right:12px}
-.sidebar .sidebar-header{text-align:center;margin-bottom:1rem;padding:1rem;border-radius:1rem;background:linear-gradient(to right,#1E40AF,#2563EB);box-shadow:0 4px 10px rgba(0,0,0,.2)}
-.sidebar .sidebar-header img{width:50px;height:50px;background:#fff;padding:6px;border-radius:50%;transition:transform .3s}
-.sidebar .sidebar-header img:hover{transform:rotate(15deg)}
-.sidebar .sidebar-footer{text-align:center;font-size:.85rem;color:rgba(255,255,255,.6);padding:10px 0;font-style:italic}
-.header-top{background-color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.1);flex-wrap:wrap;border-bottom:2px solid #3b82f6;font-style:italic}
-.header-top .logo-title{display:flex;align-items:center;gap:8px}
-.header-top .logo-title img{width:45px;height:45px;transition:transform .3s ease}
-.header-top .logo-title img:hover{transform:rotate(20deg)}
+.sidebar{
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+}
+.sidebar a{
+    color:#e2e8f0;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    padding:14px 20px;
+    border-radius:.5rem;
+    transition:all .3s ease;
+    margin-bottom: 4px;
+}
+.sidebar a:hover{
+    background-color:rgba(220, 38, 38, 0.15);
+    color:#fff;
+    text-decoration:none;
+    transform:translateX(5px);
+    border-left: 3px solid #dc2626;
+}
+.sidebar .active{
+    background: linear-gradient(90deg, rgba(220, 38, 38, 0.2) 0%, rgba(220, 38, 38, 0.05) 100%);
+    color:#fff;
+    border-left: 3px solid #dc2626;
+    box-shadow:0 4px 12px rgba(220, 38, 38, 0.2);
+}
+.sidebar i{margin-right:12px; font-size: 1.1rem;}
+.sidebar .sidebar-header{
+    text-align:center;
+    margin-bottom:1.5rem;
+    padding:1.5rem 1rem;
+    border-radius:1rem;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow:0 8px 20px rgba(220, 38, 38, 0.3);
+}
+.sidebar .sidebar-header img{
+    width:55px;
+    height:55px;
+    background:#fff;
+    padding:8px;
+    border-radius:50%;
+    transition:transform .3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.sidebar .sidebar-header img:hover{transform:rotate(15deg) scale(1.05);}
+.sidebar .sidebar-footer{
+    text-align:center;
+    font-size:.8rem;
+    color:#64748b;
+    padding:12px 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.header-top{
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding:14px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    flex-wrap:wrap;
+    border-bottom:3px solid #dc2626;
+}
+.header-top .logo-title{display:flex;align-items:center;gap:10px;}
+.header-top .logo-title img{
+    width:48px;
+    height:48px;
+    transition:transform .3s ease;
+    filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
+}
+.header-top .logo-title img:hover{transform:rotate(360deg) scale(1.1);}
+.header-top .logo-title h5{
+    color: #1e293b;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
 </style>
 @stack('styles')
 </head>
