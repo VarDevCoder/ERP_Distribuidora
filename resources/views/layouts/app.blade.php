@@ -67,7 +67,7 @@
     border-top: 1px solid rgba(255,255,255,0.1);
 }
 .header-top{
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
     padding:14px 24px;
     display:flex;
     justify-content:space-between;
@@ -81,11 +81,11 @@
     width:48px;
     height:48px;
     transition:transform .3s ease;
-    filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
 }
 .header-top .logo-title img:hover{transform:rotate(360deg) scale(1.1);}
 .header-top .logo-title h5{
-    color: #1e293b;
+    color: #ffffff;
     font-weight: 700;
     letter-spacing: 0.5px;
 }
@@ -124,9 +124,9 @@
         <h5 class="mb-0 fw-bold">DISTRIBUCIÓN Y LOGÍSTICA</h5>
       </div>
       <div class="d-flex align-items-center gap-3">
-        <span class="text-gray-600 fw-semibold"><i class="fas fa-calendar-day"></i> {{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, DD [de] MMMM [de] YYYY') }}</span>
+        <span class="text-white fw-semibold"><i class="fas fa-calendar-day"></i> {{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, DD [de] MMMM [de] YYYY') }}</span>
         <div class="dropdown">
-          <a href="#" class="text-dark text-decoration-none dropdown-toggle d-flex align-items-center" id="userMenu" data-bs-toggle="dropdown">
+          <a href="#" class="text-white text-decoration-none dropdown-toggle d-flex align-items-center" id="userMenu" data-bs-toggle="dropdown">
             <i class="fas fa-user-circle fa-2x me-1"></i> {{ session('usuario')->usu_nombre ?? 'Usuario' }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
