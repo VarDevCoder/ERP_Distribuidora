@@ -245,37 +245,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="chart-card">
-                        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-area me-2"></i>Resumen de Ventas {{ date('Y') }}</h6>
-                        @if(array_sum($ventasAnuales) > 0)
-                            <canvas id="ventasGeneralChart" style="height: 300px;"></canvas>
-                        @else
-                            <div class="alert alert-warning border-0">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Sin datos de ventas</strong><br>
-                                <small>Registra tu primera venta para ver el gráfico</small>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="chart-card">
-                        <h6 class="fw-semibold mb-3"><i class="fas fa-chart-bar me-2"></i>Resumen de Compras {{ date('Y') }}</h6>
-                        @if(array_sum($gastosMensuales) > 0)
-                            <canvas id="comprasGeneralChart" style="height: 300px;"></canvas>
-                        @else
-                            <div class="alert alert-warning border-0">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Sin datos de compras</strong><br>
-                                <small>Registra tu primera compra para ver el gráfico</small>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- ==================== VENTAS ==================== -->
@@ -668,63 +637,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-
-        // Solo crear gráficos si hay datos
-        if (tieneVentas) {
-            createChart('ventasGeneralChart', {
-                type: 'line',
-                data: {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                    datasets: [{
-                        label: 'Ventas (Gs.)',
-                        data: ventasData,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { callback: value => 'Gs. ' + (value / 1000).toFixed(0) + 'K' }
-                        }
-                    }
-                }
-            });
-        }
-
-        if (tieneCompras) {
-            createChart('comprasGeneralChart', {
-                type: 'bar',
-                data: {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                    datasets: [{
-                        label: 'Gastos (Gs.)',
-                        data: comprasData,
-                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
-                        borderColor: '#f59e0b',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { callback: value => 'Gs. ' + (value / 1000).toFixed(0) + 'K' }
-                        }
-                    }
-                }
-            });
-        }
 
         // Lazy load para tabs (solo si hay datos)
         document.querySelectorAll('[data-bs-toggle="tab"]').forEach(button => {
