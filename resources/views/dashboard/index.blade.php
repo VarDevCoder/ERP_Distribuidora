@@ -27,7 +27,7 @@
     }
 
     .nav-tabs-custom {
-        background: white;
+        background: rgba(30, 41, 59, 0.04);
         border-radius: 1rem;
         padding: 0.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -57,7 +57,7 @@
     }
 
     .metric-card {
-        background: white;
+        background: rgba(30, 41, 59, 0.04);
         border-radius: 1rem;
         padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -94,7 +94,7 @@
     .metric-icon.stock { background: rgba(220, 38, 38, 0.15); color: var(--danger-color); }
 
     .chart-card {
-        background: white;
+        background: rgba(30, 41, 59, 0.04);
         border-radius: 1rem;
         padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -102,7 +102,7 @@
     }
 
     .table-card {
-        background: white;
+        background: rgba(30, 41, 59, 0.04);
         border-radius: 1rem;
         padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
