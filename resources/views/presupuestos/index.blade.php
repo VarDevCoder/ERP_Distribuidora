@@ -1,70 +1,116 @@
 @extends('layouts.app')
-@section('title', 'Presupuestos')
-@section('content')
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold"><i class="fas fa-file-invoice me-2"></i>Gestión de Presupuestos</h2>
-        <a href="{{ route('presupuestos.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Nuevo Presupuesto
-        </a>
-    </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Número</th>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th>Vencimiento</th>
-                            <th>Total</th>
-                            <th>Estado</th>
-                            <th>Usuario</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($presupuestos as $pre)
-                        <tr>
-                            <td class="fw-bold">{{ $pre->pre_numero }}</td>
-                            <td>{{ \Carbon\Carbon::parse($pre->pre_fecha)->format('d/m/Y') }}</td>
-                            <td>{{ $pre->cliente->cli_nombre }} {{ $pre->cliente->cli_apellido }}</td>
-                            <td>{{ \Carbon\Carbon::parse($pre->pre_fecha_vencimiento)->format('d/m/Y') }}</td>
-                            <td class="fw-bold text-success">Gs. {{ number_format($pre->pre_total, 0, ',', '.') }}</td>
-                            <td>
-                                @php
-                                    $badgeClass = match($pre->pre_estado) {
-                                        'PENDIENTE' => 'warning',
-                                        'APROBADO' => 'info',
-                                        'CONVERTIDO' => 'success',
-                                        'RECHAZADO' => 'danger',
-                                        default => 'secondary'
-                                    };
-                                @endphp
-                                <span class="badge bg-{{ $badgeClass }}">{{ $pre->pre_estado }}</span>
-                            </td>
-                            <td>{{ $pre->usuario->usu_nombre }}</td>
-                            <td>
-                                <a href="{{ route('presupuestos.show', $pre->pre_id) }}" class="btn btn-sm btn-info" title="Ver">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                @if($pre->pre_estado == 'APROBADO')
-                                <a href="{{ route('presupuestos.convertir', $pre->pre_id) }}" class="btn btn-sm btn-success" title="Convertir a Venta">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </a>
-                                @endif
-                            </td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="8" class="text-center text-muted py-4">No hay presupuestos registrados</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            {{ $presupuestos->links() }}
+@section('content')
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Presupuestos</h1>
+            <p class="text-gray-600 mt-1">Gestiona presupuestos de compra y venta</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="{{ route('presupuestos.create', ['tipo' => 'COMPRA']) }}"
+               class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                + Presupuesto de Compra
+            </a>
+            <a href="{{ route('presupuestos.create', ['tipo' => 'VENTA']) }}"
+               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                + Presupuesto de Venta
+            </a>
         </div>
     </div>
+
+    <!-- Filtros -->
+    <div class="bg-blue-50 rounded-lg shadow-lg p-5 mb-6 border-2 border-blue-200">
+        <div class="flex space-x-4">
+            <a href="{{ route('presupuestos.index') }}"
+               class="px-4 py-2 rounded-lg font-medium {{ !request('tipo') ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-blue-50 border-2 border-gray-300' }} transition">
+                Todos
+            </a>
+            <a href="{{ route('presupuestos.index', ['tipo' => 'COMPRA']) }}"
+               class="px-4 py-2 rounded-lg font-medium {{ request('tipo') === 'COMPRA' ? 'bg-green-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-blue-50 border-2 border-gray-300' }} transition">
+                Compras
+            </a>
+            <a href="{{ route('presupuestos.index', ['tipo' => 'VENTA']) }}"
+               class="px-4 py-2 rounded-lg font-medium {{ request('tipo') === 'VENTA' ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-blue-50 border-2 border-gray-300' }} transition">
+                Ventas
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabla de Presupuestos -->
+    <x-data-table :headers="['NÃºmero', 'Tipo', 'Contacto', 'Fecha', 'Total', 'Estado', 'Acciones']" color="blue">
+        @forelse($presupuestos as $presupuesto)
+            <x-table-row color="blue">
+                <x-table-cell class="whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ $presupuesto->numero }}
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap">
+                    @if($presupuesto->tipo === 'COMPRA')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Compra
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Venta
+                        </span>
+                    @endif
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ $presupuesto->contacto_nombre }}</div>
+                    @if($presupuesto->contacto_empresa)
+                        <div class="text-xs text-gray-500">{{ $presupuesto->contacto_empresa }}</div>
+                    @endif
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap text-sm text-gray-700">
+                    {{ \Carbon\Carbon::parse($presupuesto->fecha)->format('d/m/Y') }}
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap text-sm font-semibold text-gray-900">
+                    ${{ number_format($presupuesto->total, 2) }}
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap">
+                    @php
+                        $estadoClases = [
+                            'BORRADOR' => 'bg-gray-100 text-gray-800',
+                            'ENVIADO' => 'bg-blue-100 text-blue-800',
+                            'APROBADO' => 'bg-green-100 text-green-800',
+                            'RECHAZADO' => 'bg-red-100 text-red-800',
+                            'CONVERTIDO' => 'bg-purple-100 text-purple-800'
+                        ];
+                        $clase = $estadoClases[$presupuesto->estado] ?? 'bg-gray-100 text-gray-800';
+                    @endphp
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $clase }}">
+                        {{ $presupuesto->estado }}
+                    </span>
+                </x-table-cell>
+                <x-table-cell :last="true" class="whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                        <a href="{{ route('presupuestos.show', $presupuesto) }}" class="text-blue-600 hover:text-blue-900">Ver</a>
+                        @if($presupuesto->estado !== 'CONVERTIDO')
+                            <a href="{{ route('presupuestos.edit', $presupuesto) }}" class="text-green-600 hover:text-green-900">Editar</a>
+                        @endif
+                    </div>
+                </x-table-cell>
+            </x-table-row>
+        @empty
+            <tr>
+                <td colspan="7" class="px-6 py-12 text-center">
+                    <div class="text-gray-400 text-lg">
+                        <p class="mb-2">No hay presupuestos registrados</p>
+                        <a href="{{ route('presupuestos.create') }}" class="text-blue-600 hover:text-blue-800">
+                            Crear el primer presupuesto
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        @endforelse
+    </x-data-table>
+
+    <!-- PaginaciÃ³n -->
+    @if($presupuestos->hasPages())
+        <div class="mt-6">
+            {{ $presupuestos->links() }}
+        </div>
+    @endif
 </div>
 @endsection

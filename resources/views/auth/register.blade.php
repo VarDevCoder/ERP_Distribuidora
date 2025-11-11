@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Ankhor ERP</title>
+    <title>Registro - Ankhor ERP</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Animated background */
         .animated-bg {
-            background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #1e40af, #2563eb);
+            background: linear-gradient(-45deg, #059669, #10b981, #047857, #14b8a6);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
         }
@@ -83,9 +83,9 @@
 </head>
 <body class="h-screen overflow-hidden">
     <div class="flex h-full">
-        <!-- Left Side - Login Form -->
-        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
-            <div class="w-full max-w-md">
+        <!-- Left Side - Register Form -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 overflow-y-auto">
+            <div class="w-full max-w-md my-8">
                 <!-- Logo and Brand -->
                 <div class="text-center mb-8">
                     <div class="flex items-center justify-center mb-4">
@@ -95,9 +95,9 @@
                     <p class="text-gray-600">Sistema de Gestión Empresarial</p>
                 </div>
 
-                <!-- Login Form -->
+                <!-- Register Form -->
                 <div class="bg-white rounded-2xl shadow-xl p-8 border-2 border-gray-200">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Iniciar Sesión</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Crear Cuenta</h2>
 
                     @if ($errors->any())
                         <div class="mb-4 bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -109,28 +109,44 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('login.post') }}">
+                    <form method="POST" action="{{ route('register.post') }}">
                         @csrf
 
-                        <!-- Email -->
+                        <!-- Name -->
                         <div class="mb-4">
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                Usuario / Email
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nombre Completo
                             </label>
                             <input
                                 type="text"
-                                name="email"
-                                id="email"
-                                value="{{ old('email') }}"
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
-                                placeholder="Ingresa tu usuario o email"
+                                name="name"
+                                id="name"
+                                value="{{ old('name') }}"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 transition"
+                                placeholder="Ingresa tu nombre completo"
                                 required
                                 autofocus
                             >
                         </div>
 
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                value="{{ old('email') }}"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 transition"
+                                placeholder="Ingresa tu email"
+                                required
+                            >
+                        </div>
+
                         <!-- Password -->
-                        <div class="mb-6">
+                        <div class="mb-4">
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
                                 Contraseña
                             </label>
@@ -138,47 +154,45 @@
                                 type="password"
                                 name="password"
                                 id="password"
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
-                                placeholder="Ingresa tu contraseña"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 transition"
+                                placeholder="Mínimo 8 caracteres"
                                 required
                             >
                         </div>
 
-                        <!-- Remember Me -->
-                        <div class="flex items-center justify-between mb-6">
-                            <label class="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    name="remember"
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                >
-                                <span class="ml-2 text-sm text-gray-600">Recordarme</span>
+                        <!-- Confirm Password -->
+                        <div class="mb-6">
+                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
+                                Confirmar Contraseña
                             </label>
+                            <input
+                                type="password"
+                                name="password_confirmation"
+                                id="password_confirmation"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 transition"
+                                placeholder="Repite tu contraseña"
+                                required
+                            >
                         </div>
 
                         <!-- Submit Button -->
                         <button
                             type="submit"
-                            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-200 shadow-lg"
+                            class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition duration-200 shadow-lg"
                         >
-                            Iniciar Sesión
+                            Crear Cuenta
                         </button>
                     </form>
 
-                    <!-- Register Link -->
+                    <!-- Login Link -->
                     <div class="mt-6 text-center">
                         <p class="text-sm text-gray-600">
-                            ¿No tienes una cuenta?
-                            <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-800 font-semibold">
-                                Regístrate aquí
+                            ¿Ya tienes una cuenta?
+                            <a href="{{ route('login') }}" class="text-green-600 hover:text-green-800 font-semibold">
+                                Inicia sesión aquí
                             </a>
                         </p>
                     </div>
-                </div>
-
-                <!-- Footer Note -->
-                <div class="mt-6 text-center text-sm text-gray-500">
-                    <p>Credenciales por defecto: admin123 / admin123</p>
                 </div>
             </div>
         </div>
@@ -193,30 +207,38 @@
 
             <!-- Content -->
             <div class="relative z-10 text-center text-white px-12">
-                <h2 class="text-5xl font-bold mb-6">Bienvenido a Ankhor</h2>
-                <p class="text-xl text-blue-100 mb-8">
-                    Gestiona tu empresa de manera eficiente con nuestro sistema integral de ERP
+                <h2 class="text-5xl font-bold mb-6">Únete a Ankhor</h2>
+                <p class="text-xl text-green-100 mb-8">
+                    Comienza a gestionar tu negocio de forma profesional y eficiente
                 </p>
-                <div class="grid grid-cols-2 gap-6 mt-12">
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <div class="text-4xl mb-3">📦</div>
-                        <h3 class="font-semibold text-lg mb-2">Inventario</h3>
-                        <p class="text-sm text-blue-100">Control total de productos</p>
+                <div class="grid grid-cols-1 gap-6 mt-12 max-w-md mx-auto">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-left">
+                        <div class="flex items-center mb-3">
+                            <span class="text-3xl mr-3">✅</span>
+                            <h3 class="font-semibold text-lg">Registro Fácil</h3>
+                        </div>
+                        <p class="text-sm text-green-100">Crea tu cuenta en menos de un minuto</p>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <div class="text-4xl mb-3">💼</div>
-                        <h3 class="font-semibold text-lg mb-2">Presupuestos</h3>
-                        <p class="text-sm text-blue-100">Gestión de compra y venta</p>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-left">
+                        <div class="flex items-center mb-3">
+                            <span class="text-3xl mr-3">🔒</span>
+                            <h3 class="font-semibold text-lg">100% Seguro</h3>
+                        </div>
+                        <p class="text-sm text-green-100">Tus datos están protegidos y encriptados</p>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <div class="text-4xl mb-3">📋</div>
-                        <h3 class="font-semibold text-lg mb-2">Notas de Remisión</h3>
-                        <p class="text-sm text-blue-100">Seguimiento de entregas</p>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-left">
+                        <div class="flex items-center mb-3">
+                            <span class="text-3xl mr-3">🚀</span>
+                            <h3 class="font-semibold text-lg">Acceso Inmediato</h3>
+                        </div>
+                        <p class="text-sm text-green-100">Empieza a usar el sistema de inmediato</p>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <div class="text-4xl mb-3">📊</div>
-                        <h3 class="font-semibold text-lg mb-2">Reportes</h3>
-                        <p class="text-sm text-blue-100">Análisis en tiempo real</p>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-left">
+                        <div class="flex items-center mb-3">
+                            <span class="text-3xl mr-3">💡</span>
+                            <h3 class="font-semibold text-lg">Soporte 24/7</h3>
+                        </div>
+                        <p class="text-sm text-green-100">Estamos aquí para ayudarte en todo momento</p>
                     </div>
                 </div>
             </div>

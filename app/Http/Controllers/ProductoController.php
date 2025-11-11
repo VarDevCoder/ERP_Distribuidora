@@ -7,90 +7,79 @@ use App\Models\Producto;
 
 class ProductoController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        if (!session('usuario')) return redirect()->route('login');
-
-        $query = Producto::query();
-
-        if ($request->has('buscar')) {
-            $buscar = $request->buscar;
-            $query->where(function($q) use ($buscar) {
-                $q->where('pro_nombre', 'ILIKE', "%$buscar%")
-                  ->orWhere('pro_codigo', 'ILIKE', "%$buscar%")
-                  ->orWhere('pro_categoria', 'ILIKE', "%$buscar%");
-            });
-        }
-
-        $productos = $query->orderBy('pro_nombre')->paginate(10);
+        $productos = Producto::orderBy('nombre')->paginate(20);
         return view('productos.index', compact('productos'));
     }
 
     public function create()
     {
-        if (!session('usuario')) return redirect()->route('login');
         return view('productos.create');
     }
 
     public function store(Request $request)
     {
-        if (!session('usuario')) return redirect()->route('login');
-
-        $request->validate([
-            'pro_codigo' => 'required|unique:producto,pro_codigo|max:50',
-            'pro_nombre' => 'required|max:100',
-            'pro_categoria' => 'required|max:50',
-            'pro_precio_compra' => 'required|numeric|min:0',
-            'pro_precio_venta' => 'required|numeric|min:0',
-            'pro_stock' => 'required|integer|min:0',
-            'pro_stock_minimo' => 'required|integer|min:0',
-            'pro_unidad_medida' => 'required'
+        $validated = $request->validate([
+            'codigo' => 'nullable|string|max:50|unique:productos',
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'precio_compra' => 'required|numeric|min:0',
+            'precio_venta' => 'required|numeric|min:0',
+            'stock_actual' => 'nullable|integer|min:0',
+            'stock_minimo' => 'nullable|integer|min:0',
+            'unidad_medida' => 'required|string|max:20',
+            'activo' => 'boolean',
         ]);
 
-        Producto::create($request->all());
+        $validated['activo'] = $request->has('activo');
+
+        Producto::create($validated);
 
         return redirect()->route('productos.index')
             ->with('success', 'Producto creado exitosamente');
     }
 
-    public function edit($id)
+    public function show(Producto $producto)
     {
-        if (!session('usuario')) return redirect()->route('login');
-        $producto = Producto::findOrFail($id);
+        $producto->load('movimientos');
+        return view('productos.show', compact('producto'));
+    }
+
+    public function edit(Producto $producto)
+    {
         return view('productos.edit', compact('producto'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Producto $producto)
     {
-        if (!session('usuario')) return redirect()->route('login');
-
-        $producto = Producto::findOrFail($id);
-
-        $request->validate([
-            'pro_codigo' => 'required|max:50|unique:producto,pro_codigo,' . $id . ',pro_id',
-            'pro_nombre' => 'required|max:100',
-            'pro_categoria' => 'required|max:50',
-            'pro_precio_compra' => 'required|numeric|min:0',
-            'pro_precio_venta' => 'required|numeric|min:0',
-            'pro_stock' => 'required|integer|min:0',
-            'pro_stock_minimo' => 'required|integer|min:0',
-            'pro_unidad_medida' => 'required'
+        $validated = $request->validate([
+            'codigo' => 'nullable|string|max:50|unique:productos,codigo,' . $producto->id,
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'precio_compra' => 'required|numeric|min:0',
+            'precio_venta' => 'required|numeric|min:0',
+            'stock_minimo' => 'nullable|integer|min:0',
+            'unidad_medida' => 'required|string|max:20',
+            'activo' => 'boolean',
         ]);
 
-        $producto->update($request->all());
+        $validated['activo'] = $request->has('activo');
 
-        return redirect()->route('productos.index')
+        $producto->update($validated);
+
+        return redirect()->route('productos.show', $producto)
             ->with('success', 'Producto actualizado exitosamente');
     }
 
-    public function destroy($id)
+    public function destroy(Producto $producto)
     {
-        if (!session('usuario')) return redirect()->route('login');
-
-        $producto = Producto::findOrFail($id);
-        $producto->delete();
-
-        return redirect()->route('productos.index')
-            ->with('success', 'Producto eliminado exitosamente');
+        try {
+            $producto->delete();
+            return redirect()->route('productos.index')
+                ->with('success', 'Producto eliminado');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se puede eliminar el producto porque tiene registros relacionados');
+        }
     }
 }

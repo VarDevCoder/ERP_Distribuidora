@@ -7,7 +7,14 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(rm:*)",
+      "Bash(php artisan migrate:fresh:*)",
+      "Bash(php artisan:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(if not exist auth mkdir auth)",
+      "Bash(psql:*)"
     ],
     "deny": [],
     "ask": []

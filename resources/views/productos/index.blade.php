@@ -1,79 +1,84 @@
 @extends('layouts.app')
 
-@section('title', 'Productos - ERP Distribuidora')
-
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0 fw-bold text-gray-700"><i class="fas fa-box-open me-2"></i>PRODUCTOS</h4>
-    <a href="{{ route('productos.create') }}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Nuevo Producto</a>
-</div>
-
-<div class="card shadow-sm">
-    <div class="card-body">
-        <form method="GET" class="mb-3">
-            <div class="input-group">
-                <input type="text" name="buscar" class="form-control" placeholder="Buscar por nombre, código o categoría..." value="{{ request('buscar') }}">
-                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
-            </div>
-        </form>
-
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Precio Venta</th>
-                        <th>Stock</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($productos as $producto)
-                    <tr>
-                        <td><code>{{ $producto->pro_codigo }}</code></td>
-                        <td>{{ $producto->pro_nombre }}</td>
-                        <td><span class="badge bg-info">{{ $producto->pro_categoria }}</span></td>
-                        <td>Gs. {{ number_format($producto->pro_precio_venta, 0, ',', '.') }}</td>
-                        <td>
-                            <span class="badge {{ $producto->pro_stock <= $producto->pro_stock_minimo ? 'bg-danger' : 'bg-success' }}">
-                                {{ $producto->pro_stock }} {{ $producto->pro_unidad_medida }}
-                            </span>
-                        </td>
-                        <td>
-                            @if($producto->pro_stock <= $producto->pro_stock_minimo)
-                                <span class="badge bg-warning"><i class="fas fa-exclamation-triangle"></i> Stock Bajo</span>
-                            @else
-                                <span class="badge bg-success"><i class="fas fa-check"></i> OK</span>
-                            @endif
-                        </td>
-                        <td>
-                            <a href="{{ route('productos.edit', $producto->pro_id) }}" class="btn btn-sm btn-warning" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('productos.destroy', $producto->pro_id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este producto?')" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">No hay productos registrados</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Productos</h1>
+            <p class="text-gray-600 mt-1">Gestiona el catálogo de productos</p>
         </div>
+        <a href="{{ route('productos.create') }}"
+           class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
+            + Nuevo Producto
+        </a>
+    </div>
 
-        <div class="mt-3">
+    <!-- Tabla de Productos -->
+    <x-data-table :headers="['Código', 'Nombre', 'Precio Compra', 'Precio Venta', 'Stock', 'Estado', 'Acciones']" color="green">
+        @forelse($productos as $producto)
+            <x-table-row color="green">
+                <x-table-cell class="whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ $producto->codigo }}
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">{{ $producto->nombre }}</div>
+                    @if($producto->descripcion)
+                        <div class="text-sm text-gray-500">{{ Str::limit($producto->descripcion, 40) }}</div>
+                    @endif
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap text-sm text-gray-900">
+                    ${{ number_format($producto->precio_compra, 2) }}
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap text-sm text-gray-900">
+                    ${{ number_format($producto->precio_venta, 2) }}
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ $producto->stock_actual }} {{ $producto->unidad_medida }}</div>
+                    @if($producto->stock_actual <= $producto->stock_minimo)
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                            Stock bajo
+                        </span>
+                    @endif
+                </x-table-cell>
+                <x-table-cell class="whitespace-nowrap">
+                    @if($producto->activo)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Activo
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Inactivo
+                        </span>
+                    @endif
+                </x-table-cell>
+                <x-table-cell :last="true" class="whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                        <a href="{{ route('productos.show', $producto) }}" class="text-blue-600 hover:text-blue-900">Ver</a>
+                        <a href="{{ route('productos.edit', $producto) }}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                        <a href="{{ route('inventario.kardex', $producto) }}" class="text-green-600 hover:text-green-900">Kardex</a>
+                    </div>
+                </x-table-cell>
+            </x-table-row>
+        @empty
+            <tr>
+                <td colspan="7" class="px-6 py-12 text-center">
+                    <div class="text-gray-400 text-lg">
+                        <p class="mb-2">No hay productos registrados</p>
+                        <a href="{{ route('productos.create') }}" class="text-blue-600 hover:text-blue-800">
+                            Crear el primer producto
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        @endforelse
+    </x-data-table>
+
+    <!-- Paginación -->
+    @if($productos->hasPages())
+        <div class="mt-6">
             {{ $productos->links() }}
         </div>
-    </div>
+    @endif
 </div>
 @endsection

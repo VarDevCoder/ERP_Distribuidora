@@ -3,61 +3,38 @@
 @section('content')
 <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">
-            Nuevo Presupuesto de {{ $tipo === 'COMPRA' ? 'Compra' : 'Venta' }}
-        </h1>
-        <p class="text-gray-600 mt-1">
-            @if($tipo === 'COMPRA')
-                Crea un presupuesto para comprar productos a proveedores
-            @else
-                Crea un presupuesto de venta para tus clientes
-            @endif
-        </p>
+        <h1 class="text-3xl font-bold text-gray-800">Editar Presupuesto {{ $presupuesto->numero }}</h1>
+        <p class="text-gray-600 mt-1">Actualiza la información del presupuesto</p>
     </div>
 
-    <form action="{{ route('presupuestos.store') }}" method="POST" x-data="presupuestoForm()" x-on:submit.prevent="submitForm">
+    <form action="{{ route('presupuestos.update', $presupuesto) }}" method="POST" x-data="presupuestoForm({{ json_encode($presupuesto->items) }})" x-on:submit.prevent="submitForm">
         @csrf
-        <input type="hidden" name="tipo" value="{{ $tipo }}">
+        @method('PUT')
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Columna Principal -->
             <div class="lg:col-span-2 space-y-6">
-                <!-- Datos del Contacto -->
+                <!-- Datos del Cliente -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">
-                        Datos del {{ $tipo === 'COMPRA' ? 'Proveedor' : 'Cliente' }}
-                    </h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Datos del Cliente</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
-                            <input type="text" name="contacto_nombre" value="{{ old('contacto_nombre') }}" required
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                   placeholder="Ej: Juan Pérez">
-                            @error('contacto_nombre')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Cliente *</label>
+                            <input type="text" name="cliente_nombre" required value="{{ $presupuesto->cliente_nombre }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" name="contacto_email" value="{{ old('contacto_email') }}"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                   placeholder="contacto@ejemplo.com">
+                            <input type="email" name="cliente_email" value="{{ $presupuesto->cliente_email }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
-                            <input type="text" name="contacto_telefono" value="{{ old('contacto_telefono') }}"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                   placeholder="555-1234">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Empresa</label>
-                            <input type="text" name="contacto_empresa" value="{{ old('contacto_empresa') }}"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                   placeholder="Nombre de la empresa">
+                            <input type="text" name="cliente_telefono" value="{{ $presupuesto->cliente_telefono }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                     </div>
                 </div>
@@ -69,13 +46,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Fecha *</label>
-                            <input type="date" name="fecha" required value="{{ old('fecha', date('Y-m-d')) }}"
+                            <input type="date" name="fecha" required value="{{ $presupuesto->fecha->format('Y-m-d') }}"
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Vencimiento *</label>
-                            <input type="date" name="fecha_vencimiento" required value="{{ old('fecha_vencimiento', date('Y-m-d', strtotime('+30 days'))) }}"
+                            <input type="date" name="fecha_vencimiento" required value="{{ $presupuesto->fecha_vencimiento->format('Y-m-d') }}"
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                     </div>
@@ -84,9 +61,9 @@
                 <!-- Items del Presupuesto -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800">Productos</h2>
+                        <h2 class="text-xl font-bold text-gray-800">Items del Presupuesto</h2>
                         <button type="button" @click="addItem" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                            + Agregar Producto
+                            + Agregar Item
                         </button>
                     </div>
 
@@ -94,43 +71,32 @@
                         <template x-for="(item, index) in items" :key="index">
                             <div class="border border-gray-200 rounded-lg p-4 relative">
                                 <button type="button" @click="removeItem(index)"
-                                        class="absolute top-2 right-2 text-red-600 hover:text-red-800 text-xl">
-                                    ×
+                                        class="absolute top-2 right-2 text-red-600 hover:text-red-800">
+                                    ✕
                                 </button>
 
                                 <div class="grid grid-cols-12 gap-3">
-                                    <div class="col-span-12 md:col-span-5">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Producto *</label>
-                                        <select :name="`items[${index}][producto_id]`" x-model="item.producto_id"
-                                                @change="updateProductPrice(index)" required
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                            <option value="">Selecciona un producto...</option>
-                                            @foreach($productos as $producto)
-                                                <option value="{{ $producto->id }}"
-                                                        data-precio-compra="{{ $producto->precio_compra }}"
-                                                        data-precio-venta="{{ $producto->precio_venta }}"
-                                                        data-unidad="{{ $producto->unidad_medida }}">
-                                                    {{ $producto->nombre }} ({{ $producto->codigo }})
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                    <div class="col-span-12">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
+                                        <input type="text" :name="`items[${index}][descripcion]`" x-model="item.descripcion" required
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     </div>
 
-                                    <div class="col-span-6 md:col-span-3">
+                                    <div class="col-span-4">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad *</label>
                                         <input type="number" :name="`items[${index}][cantidad]`" x-model="item.cantidad"
                                                @input="calculateSubtotal(index)" required min="0.01" step="0.01"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     </div>
 
-                                    <div class="col-span-6 md:col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unit. *</label>
+                                    <div class="col-span-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario *</label>
                                         <input type="number" :name="`items[${index}][precio_unitario]`" x-model="item.precio_unitario"
                                                @input="calculateSubtotal(index)" required min="0" step="0.01"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     </div>
 
-                                    <div class="col-span-12 md:col-span-2">
+                                    <div class="col-span-4">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Subtotal</label>
                                         <input type="text" x-model="'$' + item.subtotal.toFixed(2)" readonly
                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 font-semibold">
@@ -139,18 +105,6 @@
                             </div>
                         </template>
                     </div>
-
-                    <div x-show="items.length === 0" class="text-center py-8 text-gray-500">
-                        No hay productos. Haz clic en "Agregar Producto" para comenzar.
-                    </div>
-                </div>
-
-                <!-- Notas -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Notas</h2>
-                    <textarea name="notas" rows="3"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Notas adicionales para el presupuesto...">{{ old('notas') }}</textarea>
                 </div>
             </div>
 
@@ -168,7 +122,7 @@
                         <div class="border-t pt-3">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Descuento</label>
                             <input type="number" name="descuento" x-model="descuento" @input="calculateTotals"
-                                   min="0" step="0.01" value="{{ old('descuento', 0) }}"
+                                   min="0" step="0.01" value="{{ $presupuesto->descuento }}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
 
@@ -189,10 +143,10 @@
 
                     <button type="submit"
                             class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-                        Crear Presupuesto
+                        Actualizar Presupuesto
                     </button>
 
-                    <a href="{{ route('presupuestos.index') }}"
+                    <a href="{{ route('presupuestos.show', $presupuesto) }}"
                        class="block w-full text-center bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition font-semibold mt-3">
                         Cancelar
                     </a>
@@ -203,22 +157,26 @@
 </div>
 
 <script>
-function presupuestoForm() {
+function presupuestoForm(existingItems) {
     return {
-        items: [],
-        descuento: {{ old('descuento', 0) }},
+        items: existingItems.map(item => ({
+            descripcion: item.descripcion,
+            cantidad: parseFloat(item.cantidad),
+            precio_unitario: parseFloat(item.precio_unitario),
+            subtotal: parseFloat(item.subtotal)
+        })),
+        descuento: {{ $presupuesto->descuento }},
         subtotal: 0,
         impuesto: 0,
         total: 0,
-        tipo: '{{ $tipo }}',
 
         init() {
-            this.addItem();
+            this.calculateTotals();
         },
 
         addItem() {
             this.items.push({
-                producto_id: '',
+                descripcion: '',
                 cantidad: 1,
                 precio_unitario: 0,
                 subtotal: 0
@@ -228,22 +186,6 @@ function presupuestoForm() {
         removeItem(index) {
             this.items.splice(index, 1);
             this.calculateTotals();
-        },
-
-        updateProductPrice(index) {
-            const select = event.target;
-            const selectedOption = select.options[select.selectedIndex];
-            const item = this.items[index];
-
-            if (selectedOption.value) {
-                // Usar precio de compra para COMPRA y precio de venta para VENTA
-                if (this.tipo === 'COMPRA') {
-                    item.precio_unitario = parseFloat(selectedOption.dataset.precioCompra) || 0;
-                } else {
-                    item.precio_unitario = parseFloat(selectedOption.dataset.precioVenta) || 0;
-                }
-                this.calculateSubtotal(index);
-            }
         },
 
         calculateSubtotal(index) {
@@ -261,7 +203,7 @@ function presupuestoForm() {
 
         submitForm(e) {
             if (this.items.length === 0) {
-                alert('Debes agregar al menos un producto al presupuesto');
+                alert('Debes tener al menos un item en el presupuesto');
                 return;
             }
             e.target.submit();

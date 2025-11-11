@@ -6,35 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 
 class MovimientoInventario extends Model
 {
-    protected $table = 'movimiento_inventario';
-    protected $primaryKey = 'mov_id';
+    protected $table = 'movimientos_inventario';
 
     protected $fillable = [
-        'pro_id',
-        'usu_id',
-        'mov_tipo',
-        'mov_motivo',
-        'mov_cantidad',
-        'mov_stock_anterior',
-        'mov_stock_nuevo',
-        'mov_costo',
-        'mov_referencia',
-        'mov_referencia_id',
-        'mov_observaciones',
-        'mov_fecha'
+        'producto_id', 'nota_remision_id', 'tipo', 'cantidad',
+        'stock_anterior', 'stock_nuevo', 'referencia_tipo', 'referencia_id',
+        'factura_numero', 'contrafactura_numero', 'remision_numero',
+        'usuario_id', 'observaciones'
     ];
 
     protected $casts = [
-        'mov_fecha' => 'datetime'
+        'cantidad' => 'decimal:3',
+        'stock_anterior' => 'decimal:3',
+        'stock_nuevo' => 'decimal:3',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
+    // Relaciones
     public function producto()
     {
-        return $this->belongsTo(Producto::class, 'pro_id', 'pro_id');
+        return $this->belongsTo(Producto::class);
     }
 
-    public function usuario()
+    public function notaRemision()
     {
-        return $this->belongsTo(Usuario::class, 'usu_id', 'usu_id');
+        return $this->belongsTo(NotaRemision::class);
     }
 }
