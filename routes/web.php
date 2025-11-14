@@ -44,10 +44,12 @@ Route::middleware('auth')->group(function () {
     Route::get('inventario/kardex/{producto}', [InventarioController::class, 'kardex'])->name('inventario.kardex');
 
     // Ventas - Documentos
+    Route::get('/ventas/{presupuesto}/factura', [VentaController::class, 'mostrarFormularioFactura'])->name('ventas.formulario-factura');
     Route::post('/ventas/{presupuesto}/factura', [VentaController::class, 'registrarFactura'])->name('ventas.registrar-factura');
     Route::post('/ventas/{presupuesto}/contrafactura', [VentaController::class, 'registrarContrafactura'])->name('ventas.registrar-contrafactura');
 
     // Compras - Documentos
+    Route::get('/compras/{presupuesto}/remision', [CompraController::class, 'mostrarFormularioRemision'])->name('compras.formulario-remision');
     Route::post('/compras/{presupuesto}/remision', [CompraController::class, 'registrarRemision'])->name('compras.registrar-remision');
     Route::post('/compras/{presupuesto}/contrafactura', [CompraController::class, 'registrarContrafactura'])->name('compras.registrar-contrafactura');
 });

@@ -19,10 +19,10 @@ class Presupuesto extends Model
     protected $casts = [
         'fecha' => 'date',
         'fecha_vencimiento' => 'date',
-        'subtotal' => 'decimal:2',
-        'descuento' => 'decimal:2',
-        'impuesto' => 'decimal:2',
-        'total' => 'decimal:2',
+        'subtotal' => 'integer',  // Guaraníes (sin decimales)
+        'descuento' => 'integer', // Guaraníes (sin decimales)
+        'impuesto' => 'integer',  // Guaraníes (sin decimales)
+        'total' => 'integer',     // Guaraníes (sin decimales)
         'venta_validada' => 'boolean',
         'compra_validada' => 'boolean',
         'factura_fecha' => 'date',
@@ -51,19 +51,23 @@ class Presupuesto extends Model
         return $this->hasMany(PresupuestoItem::class);
     }
 
+    public function cantidadesReales()
+    {
+        return $this->hasMany(CantidadRealDocumento::class);
+    }
+
     // Métodos
     public function calcularTotales()
     {
         $subtotal = $this->items->sum('subtotal');
         $descuento = $this->descuento ?? 0;
-        $base = $subtotal - $descuento;
-        $impuesto = $base * 0.16; // 16% IVA
-        $total = $base + $impuesto;
+        $total = $subtotal - $descuento;
 
+        // Por ahora sin IVA - se agregará después si es necesario
         $this->update([
-            'subtotal' => $subtotal,
-            'impuesto' => $impuesto,
-            'total' => $total,
+            'subtotal' => round($subtotal),
+            'impuesto' => 0,
+            'total' => round($total),
         ]);
     }
 

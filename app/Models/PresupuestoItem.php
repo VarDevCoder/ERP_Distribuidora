@@ -14,9 +14,9 @@ class PresupuestoItem extends Model
     ];
 
     protected $casts = [
-        'cantidad' => 'decimal:2',
-        'precio_unitario' => 'decimal:2',
-        'subtotal' => 'decimal:2',
+        'cantidad' => 'decimal:2',        // Puede ser decimal (ej: 2.5 kg)
+        'precio_unitario' => 'integer',   // Guaraníes (sin decimales)
+        'subtotal' => 'integer',          // Guaraníes (sin decimales)
     ];
 
     // Relaciones
@@ -35,7 +35,8 @@ class PresupuestoItem extends Model
         parent::boot();
 
         static::saving(function ($item) {
-            $item->subtotal = $item->cantidad * $item->precio_unitario;
+            // Calcular subtotal y redondear (Guaraníes)
+            $item->subtotal = round($item->cantidad * $item->precio_unitario);
         });
     }
 }

@@ -14,8 +14,8 @@ class Producto extends Model
     ];
 
     protected $casts = [
-        'precio_compra' => 'decimal:2',
-        'precio_venta' => 'decimal:2',
+        'precio_compra' => 'integer', // Guaraníes (sin decimales)
+        'precio_venta' => 'integer',  // Guaraníes (sin decimales)
         'stock_actual' => 'integer',
         'stock_minimo' => 'integer',
         'activo' => 'boolean',
