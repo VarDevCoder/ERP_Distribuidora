@@ -38,14 +38,92 @@
                     </svg>
                     <div>
                         <p class="text-sm font-medium text-green-900">Presupuesto Aprobado</p>
-                        <p class="text-xs text-green-700 mt-1">Este presupuesto está listo para convertirse en una nota de remisión</p>
+                        @if($presupuesto->tipo === 'VENTA')
+                            <p class="text-xs text-green-700 mt-1">Registra la factura para continuar con el proceso de venta</p>
+                        @else
+                            <p class="text-xs text-green-700 mt-1">Registra la remisión del proveedor para continuar con la compra</p>
+                        @endif
                     </div>
                 </div>
-                <a href="{{ route('notas-remision.create', ['presupuesto_id' => $presupuesto->id]) }}"
-                   class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
-                    Convertir a Nota de Remisión
-                </a>
+                <div class="flex space-x-2">
+                    @if($presupuesto->tipo === 'VENTA')
+                        @if(empty($presupuesto->factura_numero))
+                            <a href="{{ route('ventas.formulario-factura', $presupuesto) }}"
+                               class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium shadow-md">
+                                📄 Registrar Factura
+                            </a>
+                        @else
+                            <div class="text-sm">
+                                <p class="text-green-700 font-medium">✅ Factura: {{ $presupuesto->factura_numero }}</p>
+                                @if(empty($presupuesto->contrafactura_numero))
+                                    <button onclick="document.getElementById('contrafactura-form-venta').classList.toggle('hidden')"
+                                            class="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
+                                        Registrar Contrafactura
+                                    </button>
+                                @else
+                                    <p class="text-green-700">✅ Contrafactura: {{ $presupuesto->contrafactura_numero }}</p>
+                                @endif
+                            </div>
+                        @endif
+                    @else
+                        @if(empty($presupuesto->remision_numero))
+                            <a href="{{ route('compras.formulario-remision', $presupuesto) }}"
+                               class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium shadow-md">
+                                📦 Registrar Remisión
+                            </a>
+                        @else
+                            <div class="text-sm">
+                                <p class="text-green-700 font-medium">✅ Remisión: {{ $presupuesto->remision_numero }}</p>
+                                @if(empty($presupuesto->contrafactura_numero))
+                                    <button onclick="document.getElementById('contrafactura-form-compra').classList.toggle('hidden')"
+                                            class="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
+                                        Registrar Contrafactura
+                                    </button>
+                                @else
+                                    <p class="text-green-700">✅ Contrafactura: {{ $presupuesto->contrafactura_numero }}</p>
+                                @endif
+                            </div>
+                        @endif
+                    @endif
+                </div>
             </div>
+
+            <!-- Formularios ocultos para contrafacturas -->
+            @if($presupuesto->tipo === 'VENTA' && !empty($presupuesto->factura_numero) && empty($presupuesto->contrafactura_numero))
+                <div id="contrafactura-form-venta" class="hidden mt-4 p-4 bg-white rounded-lg border-2 border-green-300">
+                    <form method="POST" action="{{ route('ventas.registrar-contrafactura', $presupuesto) }}">
+                        @csrf
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Número de Contrafactura</label>
+                        <div class="flex space-x-2">
+                            <input type="text" name="contrafactura_numero" required
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                   placeholder="Ej: CF-001-001234">
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                Confirmar
+                            </button>
+                        </div>
+                        <p class="text-xs text-red-600 mt-2">⚠️ Esto aplicará la SALIDA al inventario</p>
+                    </form>
+                </div>
+            @endif
+
+            @if($presupuesto->tipo === 'COMPRA' && !empty($presupuesto->remision_numero) && empty($presupuesto->contrafactura_numero))
+                <div id="contrafactura-form-compra" class="hidden mt-4 p-4 bg-white rounded-lg border-2 border-green-300">
+                    <form method="POST" action="{{ route('compras.registrar-contrafactura', $presupuesto) }}">
+                        @csrf
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Número de Contrafactura</label>
+                        <div class="flex space-x-2">
+                            <input type="text" name="contrafactura_numero" required
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                   placeholder="Ej: CF-001-001234">
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                Confirmar
+                            </button>
+                        </div>
+                        <p class="text-xs text-green-600 mt-2">✅ Esto aplicará la ENTRADA al inventario</p>
+                    </form>
+                </div>
+            @endif
         </div>
     @elseif($presupuesto->estado === 'CONVERTIDO')
         <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
