@@ -53,6 +53,22 @@ class OrdenCompra extends Model
     const ESTADO_CANCELADA = 'CANCELADA';
 
     /**
+     * Obtener todos los estados con sus etiquetas
+     */
+    public static function getEstados(): array
+    {
+        return [
+            self::ESTADO_BORRADOR => 'Borrador',
+            self::ESTADO_ENVIADA => 'Enviada',
+            self::ESTADO_CONFIRMADA => 'Confirmada',
+            self::ESTADO_EN_TRANSITO => 'En Tránsito',
+            self::ESTADO_RECIBIDA_PARCIAL => 'Recibida Parcial',
+            self::ESTADO_RECIBIDA_COMPLETA => 'Recibida Completa',
+            self::ESTADO_CANCELADA => 'Cancelada',
+        ];
+    }
+
+    /**
      * Generar número de orden automáticamente
      */
     public static function generarNumero(): string

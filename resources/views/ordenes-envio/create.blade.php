@@ -47,10 +47,9 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Método</label>
                     <select name="metodo_envio" class="w-full rounded-lg border-gray-300 shadow-sm">
                         <option value="">Seleccionar...</option>
-                        <option value="RETIRO_LOCAL">Retiro en Local</option>
-                        <option value="DELIVERY_PROPIO">Delivery Propio</option>
-                        <option value="TRANSPORTE_TERCERO">Transporte Tercero</option>
-                        <option value="ENCOMIENDA">Encomienda</option>
+                        @foreach(\App\Models\OrdenEnvio::getMetodosEnvio() as $valor => $etiqueta)
+                            <option value="{{ $valor }}" {{ old('metodo_envio') == $valor ? 'selected' : '' }}>{{ $etiqueta }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div>

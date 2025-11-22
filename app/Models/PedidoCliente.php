@@ -54,6 +54,41 @@ class PedidoCliente extends Model
     const ESTADO_CANCELADO = 'CANCELADO';
 
     /**
+     * Obtener todos los estados con sus etiquetas para vistas
+     */
+    public static function getEstados(): array
+    {
+        return [
+            self::ESTADO_RECIBIDO => 'Recibido',
+            self::ESTADO_EN_PROCESO => 'En Proceso',
+            self::ESTADO_PRESUPUESTADO => 'Presupuestado',
+            self::ESTADO_ORDEN_COMPRA => 'Orden Compra',
+            self::ESTADO_MERCADERIA_RECIBIDA => 'Mercadería Recibida',
+            self::ESTADO_LISTO_ENVIO => 'Listo Envío',
+            self::ESTADO_ENVIADO => 'Enviado',
+            self::ESTADO_ENTREGADO => 'Entregado',
+            self::ESTADO_CANCELADO => 'Cancelado',
+        ];
+    }
+
+    /**
+     * Secuencia de estados para timeline (sin cancelado)
+     */
+    public static function getEstadosSecuencia(): array
+    {
+        return [
+            self::ESTADO_RECIBIDO,
+            self::ESTADO_EN_PROCESO,
+            self::ESTADO_PRESUPUESTADO,
+            self::ESTADO_ORDEN_COMPRA,
+            self::ESTADO_MERCADERIA_RECIBIDA,
+            self::ESTADO_LISTO_ENVIO,
+            self::ESTADO_ENVIADO,
+            self::ESTADO_ENTREGADO,
+        ];
+    }
+
+    /**
      * Generar número de pedido automáticamente
      */
     public static function generarNumero(): string

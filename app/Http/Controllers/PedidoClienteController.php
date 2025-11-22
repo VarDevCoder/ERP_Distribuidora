@@ -33,7 +33,7 @@ class PedidoClienteController extends Controller
             });
         }
 
-        $pedidos = $query->paginate(15);
+        $pedidos = $query->paginate(config('ankor.pagination.per_page', 15));
 
         return view('pedidos-cliente.index', compact('pedidos'));
     }

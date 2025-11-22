@@ -34,7 +34,7 @@ class OrdenEnvioController extends Controller
             });
         }
 
-        $ordenes = $query->paginate(15);
+        $ordenes = $query->paginate(config('ankor.pagination.per_page', 15));
 
         return view('ordenes-envio.index', compact('ordenes'));
     }

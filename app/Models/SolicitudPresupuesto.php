@@ -45,6 +45,30 @@ class SolicitudPresupuesto extends Model
     const ESTADO_VENCIDA = 'VENCIDA';
 
     /**
+     * Obtener todos los estados con sus etiquetas
+     */
+    public static function getEstados(): array
+    {
+        return [
+            self::ESTADO_ENVIADA => 'Enviada',
+            self::ESTADO_VISTA => 'Vista',
+            self::ESTADO_COTIZADA => 'Cotizada',
+            self::ESTADO_SIN_STOCK => 'Sin Stock',
+            self::ESTADO_ACEPTADA => 'Aceptada',
+            self::ESTADO_RECHAZADA => 'Rechazada',
+            self::ESTADO_VENCIDA => 'Vencida',
+        ];
+    }
+
+    /**
+     * Estados pendientes de respuesta del proveedor
+     */
+    public static function getEstadosPendientes(): array
+    {
+        return [self::ESTADO_ENVIADA, self::ESTADO_VISTA];
+    }
+
+    /**
      * Generar número automáticamente
      */
     public static function generarNumero(): string

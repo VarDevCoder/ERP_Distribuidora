@@ -103,7 +103,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Días estimados de entrega *</label>
-                    <input type="number" name="dias_entrega_estimados" min="1" value="7" required
+                    <input type="number" name="dias_entrega_estimados"
+                           min="{{ config('ankor.delivery.min_days', 1) }}"
+                           max="{{ config('ankor.delivery.max_days', 90) }}"
+                           value="{{ old('dias_entrega_estimados', config('ankor.delivery.default_days', 7)) }}"
+                           required
                            class="w-full rounded-lg border-gray-300 shadow-sm">
                 </div>
                 <div>
@@ -129,10 +133,15 @@ function cotizacionForm() {
     return {
         items: [
             @foreach($solicitud->items as $item)
-            { cantidad: {{ $item->cantidad_solicitada }}, precio: 0, subtotal: 0 },
+            { cantidad: {{ $item->cantidad_solicitada }}, precio: {{ $item->producto->precio_compra ?? 0 }}, subtotal: {{ (int)($item->cantidad_solicitada * ($item->producto->precio_compra ?? 0)) }} },
             @endforeach
         ],
-        total: 0,
+        total: {{ $solicitud->items->sum(fn($item) => (int)($item->cantidad_solicitada * ($item->producto->precio_compra ?? 0))) }},
+
+        init() {
+            // Recalcular totales al inicio
+            this.calcularTotal();
+        },
 
         calcularSubtotal(index) {
             this.items[index].subtotal = Math.round(this.items[index].cantidad * this.items[index].precio);

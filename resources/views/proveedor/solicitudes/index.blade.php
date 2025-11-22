@@ -13,12 +13,9 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                 <select name="estado" class="rounded-lg border-gray-300 shadow-sm">
                     <option value="">Todos</option>
-                    <option value="ENVIADA" {{ request('estado') == 'ENVIADA' ? 'selected' : '' }}>Pendientes</option>
-                    <option value="VISTA" {{ request('estado') == 'VISTA' ? 'selected' : '' }}>Vistas</option>
-                    <option value="COTIZADA" {{ request('estado') == 'COTIZADA' ? 'selected' : '' }}>Cotizadas</option>
-                    <option value="ACEPTADA" {{ request('estado') == 'ACEPTADA' ? 'selected' : '' }}>Aceptadas</option>
-                    <option value="RECHAZADA" {{ request('estado') == 'RECHAZADA' ? 'selected' : '' }}>Rechazadas</option>
-                    <option value="SIN_STOCK" {{ request('estado') == 'SIN_STOCK' ? 'selected' : '' }}>Sin Stock</option>
+                    @foreach(\App\Models\SolicitudPresupuesto::getEstados() as $valor => $etiqueta)
+                        <option value="{{ $valor }}" {{ request('estado') == $valor ? 'selected' : '' }}>{{ $etiqueta }}</option>
+                    @endforeach
                 </select>
             </div>
             <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Filtrar</button>

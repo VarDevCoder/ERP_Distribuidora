@@ -18,12 +18,9 @@
                 <label class="form-label">Estado</label>
                 <select name="estado" class="form-select">
                     <option value="">Todos</option>
-                    <option value="ENVIADA" {{ request('estado') == 'ENVIADA' ? 'selected' : '' }}>Enviada</option>
-                    <option value="VISTA" {{ request('estado') == 'VISTA' ? 'selected' : '' }}>Vista</option>
-                    <option value="COTIZADA" {{ request('estado') == 'COTIZADA' ? 'selected' : '' }}>Cotizada</option>
-                    <option value="SIN_STOCK" {{ request('estado') == 'SIN_STOCK' ? 'selected' : '' }}>Sin Stock</option>
-                    <option value="ACEPTADA" {{ request('estado') == 'ACEPTADA' ? 'selected' : '' }}>Aceptada</option>
-                    <option value="RECHAZADA" {{ request('estado') == 'RECHAZADA' ? 'selected' : '' }}>Rechazada</option>
+                    @foreach(\App\Models\SolicitudPresupuesto::getEstados() as $valor => $etiqueta)
+                        <option value="{{ $valor }}" {{ request('estado') == $valor ? 'selected' : '' }}>{{ $etiqueta }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="w-64">
@@ -57,7 +54,7 @@
             </thead>
             <tbody>
                 @forelse($solicitudes as $solicitud)
-                    <tr class="{{ $solicitud->estado == 'COTIZADA' ? 'bg-green-50' : '' }}">
+                    <tr class="{{ $solicitud->estado === \App\Models\SolicitudPresupuesto::ESTADO_COTIZADA ? 'bg-green-50' : '' }}">
                         <td>
                             <a href="{{ route('solicitudes-presupuesto.show', $solicitud) }}" class="text-blue-600 hover:text-blue-900 font-bold">
                                 {{ $solicitud->numero }}
@@ -89,7 +86,7 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            @if($solicitud->estado == 'COTIZADA')
+                            @if($solicitud->puedeSerAceptada())
                                 <form action="{{ route('solicitudes-presupuesto.aceptar', $solicitud) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit" class="btn-success text-sm px-3 py-1">

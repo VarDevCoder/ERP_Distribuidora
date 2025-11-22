@@ -25,14 +25,9 @@
                 <label class="form-label">Estado</label>
                 <select name="estado" class="form-select">
                     <option value="">Todos</option>
-                    <option value="RECIBIDO" {{ request('estado') == 'RECIBIDO' ? 'selected' : '' }}>Recibido</option>
-                    <option value="EN_PROCESO" {{ request('estado') == 'EN_PROCESO' ? 'selected' : '' }}>En Proceso</option>
-                    <option value="ORDEN_COMPRA" {{ request('estado') == 'ORDEN_COMPRA' ? 'selected' : '' }}>Orden Compra</option>
-                    <option value="MERCADERIA_RECIBIDA" {{ request('estado') == 'MERCADERIA_RECIBIDA' ? 'selected' : '' }}>Mercaderia Recibida</option>
-                    <option value="LISTO_ENVIO" {{ request('estado') == 'LISTO_ENVIO' ? 'selected' : '' }}>Listo Envio</option>
-                    <option value="ENVIADO" {{ request('estado') == 'ENVIADO' ? 'selected' : '' }}>Enviado</option>
-                    <option value="ENTREGADO" {{ request('estado') == 'ENTREGADO' ? 'selected' : '' }}>Entregado</option>
-                    <option value="CANCELADO" {{ request('estado') == 'CANCELADO' ? 'selected' : '' }}>Cancelado</option>
+                    @foreach(\App\Models\PedidoCliente::getEstados() as $valor => $etiqueta)
+                        <option value="{{ $valor }}" {{ request('estado') == $valor ? 'selected' : '' }}>{{ $etiqueta }}</option>
+                    @endforeach
                 </select>
             </div>
             <button type="submit" class="btn-primary">Filtrar</button>

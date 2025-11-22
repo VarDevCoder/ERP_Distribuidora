@@ -46,6 +46,29 @@ class OrdenEnvio extends Model
     const ESTADO_CANCELADO = 'CANCELADO';
 
     /**
+     * Obtener todos los estados con sus etiquetas
+     */
+    public static function getEstados(): array
+    {
+        return [
+            self::ESTADO_PREPARANDO => 'Preparando',
+            self::ESTADO_LISTO => 'Listo',
+            self::ESTADO_EN_TRANSITO => 'En Tránsito',
+            self::ESTADO_ENTREGADO => 'Entregado',
+            self::ESTADO_DEVUELTO => 'Devuelto',
+            self::ESTADO_CANCELADO => 'Cancelado',
+        ];
+    }
+
+    /**
+     * Obtener métodos de envío desde config
+     */
+    public static function getMetodosEnvio(): array
+    {
+        return config('ankor.metodos_envio', []);
+    }
+
+    /**
      * Generar número de orden de envío automáticamente
      */
     public static function generarNumero(): string

@@ -26,7 +26,7 @@ class ProveedorController extends Controller
             });
         }
 
-        $proveedores = $query->paginate(15);
+        $proveedores = $query->paginate(config('ankor.pagination.per_page', 15));
 
         return view('proveedores.index', compact('proveedores'));
     }

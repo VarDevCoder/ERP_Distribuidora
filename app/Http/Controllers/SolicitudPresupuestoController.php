@@ -35,7 +35,7 @@ class SolicitudPresupuestoController extends Controller
             $query->where('proveedor_id', $request->proveedor_id);
         }
 
-        $solicitudes = $query->paginate(15);
+        $solicitudes = $query->paginate(config('ankor.pagination.per_page', 15));
         $proveedores = Proveedor::orderBy('razon_social')->get();
 
         return view('solicitudes-presupuesto.index', compact('solicitudes', 'proveedores'));

@@ -26,13 +26,13 @@ class ProveedorPortalController extends Controller
         }
 
         $solicitudesPendientes = $proveedor->solicitudesPresupuesto()
-            ->whereIn('estado', ['ENVIADA', 'VISTA'])
+            ->whereIn('estado', SolicitudPresupuesto::getEstadosPendientes())
             ->count();
 
         $solicitudesRecientes = $proveedor->solicitudesPresupuesto()
             ->with('items.producto')
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(config('ankor.limits.dashboard_recent', 5))
             ->get();
 
         return view('proveedor.dashboard', compact('proveedor', 'solicitudesPendientes', 'solicitudesRecientes'));
@@ -57,7 +57,7 @@ class ProveedorPortalController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        $solicitudes = $query->paginate(15);
+        $solicitudes = $query->paginate(config('ankor.pagination.per_page', 15));
 
         return view('proveedor.solicitudes.index', compact('solicitudes'));
     }
