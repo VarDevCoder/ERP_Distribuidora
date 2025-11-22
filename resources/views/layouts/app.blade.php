@@ -76,10 +76,6 @@
                                   {{ request()->routeIs('productos.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
                             Productos
                         </a>
-                        <a href="{{ route('pedidos-cliente.create') }}"
-                           class="bg-yellow-500 text-blue-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-yellow-400 transition shadow-md">
-                            + Nuevo
-                        </a>
                     @endif
 
                     <!-- User Menu -->
