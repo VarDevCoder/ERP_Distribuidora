@@ -8,12 +8,12 @@ return new class extends Migration
 {
     /**
      * Agregar sistema de roles a usuarios
-     * ROLES: admin, colaborador, proveedor
+     * ROLES: admin, ankor_user, proveedor
      */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('rol', ['admin', 'colaborador', 'proveedor'])->default('colaborador')->after('email');
+            $table->enum('rol', ['admin', 'ankor_user', 'proveedor'])->default('ankor_user')->after('email');
             $table->boolean('activo')->default(true)->after('rol');
         });
 

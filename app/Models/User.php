@@ -14,9 +14,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     // Roles del sistema
-    const ROL_ADMIN = 'admin';
-    const ROL_COLABORADOR = 'colaborador';
-    const ROL_PROVEEDOR = 'proveedor';
+    const ROL_ADMIN = 'admin';           // Acceso total
+    const ROL_ANKOR_USER = 'ankor_user'; // Solo flujo ANKOR
+    const ROL_PROVEEDOR = 'proveedor';   // Solo portal proveedor
 
     /**
      * The attributes that are mass assignable.
@@ -67,9 +67,9 @@ class User extends Authenticatable
         return $this->rol === self::ROL_ADMIN;
     }
 
-    public function esColaborador(): bool
+    public function esAnkorUser(): bool
     {
-        return $this->rol === self::ROL_COLABORADOR || $this->rol === self::ROL_ADMIN;
+        return $this->rol === self::ROL_ANKOR_USER || $this->rol === self::ROL_ADMIN;
     }
 
     public function esProveedor(): bool
@@ -84,7 +84,7 @@ class User extends Authenticatable
     {
         return match($this->rol) {
             self::ROL_ADMIN => 'Administrador',
-            self::ROL_COLABORADOR => 'Colaborador',
+            self::ROL_ANKOR_USER => 'Usuario ANKOR',
             self::ROL_PROVEEDOR => 'Proveedor',
             default => 'Usuario',
         };

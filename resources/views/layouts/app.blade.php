@@ -39,7 +39,7 @@
                             Mi Perfil
                         </a>
                     @else
-                        {{-- MENÚ ANKOR (Colaboradores/Admin) --}}
+                        {{-- MENÚ ANKOR (AnkorUser/Admin) --}}
                         <a href="{{ route('pedidos-cliente.index') }}"
                            class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
                                   {{ request()->routeIs('pedidos-cliente.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
