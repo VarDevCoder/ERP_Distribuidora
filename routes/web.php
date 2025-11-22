@@ -2,12 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PresupuestoController;
 use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\NotaRemisionController;
 use App\Http\Controllers\InventarioController;
-use App\Http\Controllers\VentaController;
-use App\Http\Controllers\CompraController;
 use App\Http\Controllers\PedidoClienteController;
 use App\Http\Controllers\OrdenCompraController;
 use App\Http\Controllers\OrdenEnvioController;
@@ -37,7 +33,7 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
 
     // ============================================
-    // PORTAL PROVEEDOR (solo usuarios con rol proveedor)
+    // PORTAL PROVEEDOR
     // ============================================
     Route::prefix('proveedor')->name('proveedor.')->group(function () {
         Route::get('/', [ProveedorPortalController::class, 'dashboard'])->name('dashboard');
@@ -51,43 +47,25 @@ Route::middleware('auth')->group(function () {
     });
 
     // ============================================
-    // GESTIÓN DE PROVEEDORES (solo ANKOR)
+    // GESTIÓN DE PROVEEDORES
     // ============================================
     Route::resource('proveedores', ProveedorController::class);
     Route::post('proveedores/{proveedor}/toggle-activo', [ProveedorController::class, 'toggleActivo'])->name('proveedores.toggle-activo');
 
     // ============================================
-    // SOLICITUDES DE PRESUPUESTO (ANKOR pide a proveedores)
+    // SOLICITUDES DE COTIZACIÓN
     // ============================================
     Route::resource('solicitudes-presupuesto', SolicitudPresupuestoController::class)->except(['edit', 'update', 'destroy']);
     Route::post('solicitudes-presupuesto/{solicitud}/aceptar', [SolicitudPresupuestoController::class, 'aceptar'])->name('solicitudes-presupuesto.aceptar');
     Route::post('solicitudes-presupuesto/{solicitud}/rechazar', [SolicitudPresupuestoController::class, 'rechazar'])->name('solicitudes-presupuesto.rechazar');
 
-    // Presupuestos
-    Route::resource('presupuestos', PresupuestoController::class);
-    Route::post('presupuestos/{presupuesto}/aprobar', [PresupuestoController::class, 'aprobar'])->name('presupuestos.aprobar');
-
-    // Productos
+    // ============================================
+    // PRODUCTOS E INVENTARIO
+    // ============================================
     Route::resource('productos', ProductoController::class);
-
-    // Notas de Remisión
-    Route::resource('notas-remision', NotaRemisionController::class);
-    Route::post('notas-remision/{notaRemision}/aplicar', [NotaRemisionController::class, 'aplicar'])->name('notas-remision.aplicar');
-
-    // Inventario
     Route::get('inventario', [InventarioController::class, 'index'])->name('inventario.index');
     Route::get('inventario/movimientos', [InventarioController::class, 'movimientos'])->name('inventario.movimientos');
     Route::get('inventario/kardex/{producto}', [InventarioController::class, 'kardex'])->name('inventario.kardex');
-
-    // Ventas - Documentos
-    Route::get('/ventas/{presupuesto}/factura', [VentaController::class, 'mostrarFormularioFactura'])->name('ventas.formulario-factura');
-    Route::post('/ventas/{presupuesto}/factura', [VentaController::class, 'registrarFactura'])->name('ventas.registrar-factura');
-    Route::post('/ventas/{presupuesto}/contrafactura', [VentaController::class, 'registrarContrafactura'])->name('ventas.registrar-contrafactura');
-
-    // Compras - Documentos
-    Route::get('/compras/{presupuesto}/remision', [CompraController::class, 'mostrarFormularioRemision'])->name('compras.formulario-remision');
-    Route::post('/compras/{presupuesto}/remision', [CompraController::class, 'registrarRemision'])->name('compras.registrar-remision');
-    Route::post('/compras/{presupuesto}/contrafactura', [CompraController::class, 'registrarContrafactura'])->name('compras.registrar-contrafactura');
 
     // ============================================
     // FLUJO ANKOR - Pedidos de Clientes
@@ -98,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::post('pedidos-cliente/{pedido}/mercaderia-recibida', [PedidoClienteController::class, 'marcarMercaderiaRecibida'])->name('pedidos-cliente.mercaderia-recibida');
 
     // ============================================
-    // FLUJO ANKOR - Órdenes de Compra a Proveedores
+    // FLUJO ANKOR - Órdenes de Compra
     // ============================================
     Route::resource('ordenes-compra', OrdenCompraController::class);
     Route::post('ordenes-compra/{orden}/enviar', [OrdenCompraController::class, 'enviar'])->name('ordenes-compra.enviar');
@@ -109,7 +87,7 @@ Route::middleware('auth')->group(function () {
     Route::post('ordenes-compra/{orden}/cancelar', [OrdenCompraController::class, 'cancelar'])->name('ordenes-compra.cancelar');
 
     // ============================================
-    // FLUJO ANKOR - Órdenes de Envío a Clientes
+    // FLUJO ANKOR - Órdenes de Envío
     // ============================================
     Route::resource('ordenes-envio', OrdenEnvioController::class)->except(['edit', 'update']);
     Route::post('ordenes-envio/{orden}/lista-despachar', [OrdenEnvioController::class, 'listaDespachar'])->name('ordenes-envio.lista-despachar');
