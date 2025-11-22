@@ -21,51 +21,75 @@
 
                 <!-- Menú de Navegación -->
                 <div class="flex items-center space-x-4">
-                    <!-- FLUJO ANKOR -->
-                    <a href="{{ route('pedidos-cliente.index') }}"
-                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
-                              {{ request()->routeIs('pedidos-cliente.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        Pedidos
-                    </a>
-                    <a href="{{ route('ordenes-compra.index') }}"
-                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
-                              {{ request()->routeIs('ordenes-compra.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        Compras
-                    </a>
-                    <a href="{{ route('ordenes-envio.index') }}"
-                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
-                              {{ request()->routeIs('ordenes-envio.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        Envíos
-                    </a>
-                    <span class="text-blue-600">|</span>
-                    <!-- MÓDULOS BASE -->
-                    <a href="{{ route('presupuestos.index') }}"
-                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
-                              {{ request()->routeIs('presupuestos.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        Presupuestos
-                    </a>
-                    <a href="{{ route('inventario.index') }}"
-                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
-                              {{ request()->routeIs('inventario.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        Inventario
-                    </a>
-                    <a href="{{ route('productos.index') }}"
-                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
-                              {{ request()->routeIs('productos.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        Productos
-                    </a>
-                    <a href="{{ route('pedidos-cliente.create') }}"
-                       class="bg-yellow-500 text-blue-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-yellow-400 transition shadow-md">
-                        + Nuevo Pedido
-                    </a>
+                    @if(Auth::user()->esProveedor())
+                        {{-- MENÚ PROVEEDOR --}}
+                        <a href="{{ route('proveedor.dashboard') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('proveedor.dashboard') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Inicio
+                        </a>
+                        <a href="{{ route('proveedor.solicitudes') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('proveedor.solicitudes') || request()->routeIs('proveedor.solicitud.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Solicitudes
+                        </a>
+                        <a href="{{ route('proveedor.perfil') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('proveedor.perfil') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Mi Perfil
+                        </a>
+                    @else
+                        {{-- MENÚ ANKOR (Colaboradores/Admin) --}}
+                        <a href="{{ route('pedidos-cliente.index') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('pedidos-cliente.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Pedidos
+                        </a>
+                        <a href="{{ route('solicitudes-presupuesto.index') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('solicitudes-presupuesto.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Cotizaciones
+                        </a>
+                        <a href="{{ route('ordenes-compra.index') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('ordenes-compra.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Compras
+                        </a>
+                        <a href="{{ route('ordenes-envio.index') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('ordenes-envio.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Envíos
+                        </a>
+                        <span class="text-blue-600">|</span>
+                        <a href="{{ route('proveedores.index') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('proveedores.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Proveedores
+                        </a>
+                        <a href="{{ route('inventario.index') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('inventario.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Inventario
+                        </a>
+                        <a href="{{ route('productos.index') }}"
+                           class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                                  {{ request()->routeIs('productos.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                            Productos
+                        </a>
+                        <a href="{{ route('pedidos-cliente.create') }}"
+                           class="bg-yellow-500 text-blue-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-yellow-400 transition shadow-md">
+                            + Nuevo
+                        </a>
+                    @endif
 
                     <!-- User Menu -->
                     <div class="flex items-center space-x-3 ml-4 pl-4 border-l border-blue-600">
                         <span class="text-blue-100 text-sm">{{ Auth::user()->name }}</span>
+                        <span class="text-xs text-blue-300">({{ Auth::user()->rol_nombre }})</span>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
                             <button type="submit" class="text-red-300 hover:text-red-100 text-sm font-medium transition">
-                                🚪 Salir
+                                Salir
                             </button>
                         </form>
                     </div>

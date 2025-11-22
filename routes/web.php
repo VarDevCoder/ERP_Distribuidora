@@ -11,6 +11,9 @@ use App\Http\Controllers\CompraController;
 use App\Http\Controllers\PedidoClienteController;
 use App\Http\Controllers\OrdenCompraController;
 use App\Http\Controllers\OrdenEnvioController;
+use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\SolicitudPresupuestoController;
+use App\Http\Controllers\ProveedorPortalController;
 
 // Authentication Routes
 Route::get('/', function () {
@@ -25,10 +28,40 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Protected Routes
 Route::middleware('auth')->group(function () {
-    // Dashboard redirect
+    // Dashboard redirect según rol
     Route::get('/dashboard', function () {
-        return redirect()->route('presupuestos.index');
+        if (auth()->user()->esProveedor()) {
+            return redirect()->route('proveedor.dashboard');
+        }
+        return redirect()->route('pedidos-cliente.index');
     })->name('dashboard');
+
+    // ============================================
+    // PORTAL PROVEEDOR (solo usuarios con rol proveedor)
+    // ============================================
+    Route::prefix('proveedor')->name('proveedor.')->group(function () {
+        Route::get('/', [ProveedorPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/solicitudes', [ProveedorPortalController::class, 'solicitudes'])->name('solicitudes');
+        Route::get('/solicitud/{solicitud}', [ProveedorPortalController::class, 'verSolicitud'])->name('solicitud.ver');
+        Route::get('/solicitud/{solicitud}/responder', [ProveedorPortalController::class, 'formResponder'])->name('solicitud.responder');
+        Route::post('/solicitud/{solicitud}/cotizar', [ProveedorPortalController::class, 'enviarCotizacion'])->name('solicitud.cotizar');
+        Route::post('/solicitud/{solicitud}/sin-stock', [ProveedorPortalController::class, 'marcarSinStock'])->name('solicitud.sin-stock');
+        Route::get('/perfil', [ProveedorPortalController::class, 'perfil'])->name('perfil');
+        Route::put('/perfil', [ProveedorPortalController::class, 'actualizarPerfil'])->name('perfil.actualizar');
+    });
+
+    // ============================================
+    // GESTIÓN DE PROVEEDORES (solo ANKOR)
+    // ============================================
+    Route::resource('proveedores', ProveedorController::class);
+    Route::post('proveedores/{proveedor}/toggle-activo', [ProveedorController::class, 'toggleActivo'])->name('proveedores.toggle-activo');
+
+    // ============================================
+    // SOLICITUDES DE PRESUPUESTO (ANKOR pide a proveedores)
+    // ============================================
+    Route::resource('solicitudes-presupuesto', SolicitudPresupuestoController::class)->except(['edit', 'update', 'destroy']);
+    Route::post('solicitudes-presupuesto/{solicitud}/aceptar', [SolicitudPresupuestoController::class, 'aceptar'])->name('solicitudes-presupuesto.aceptar');
+    Route::post('solicitudes-presupuesto/{solicitud}/rechazar', [SolicitudPresupuestoController::class, 'rechazar'])->name('solicitudes-presupuesto.rechazar');
 
     // Presupuestos
     Route::resource('presupuestos', PresupuestoController::class);
