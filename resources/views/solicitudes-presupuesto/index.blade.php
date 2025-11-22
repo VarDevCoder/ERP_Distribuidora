@@ -4,19 +4,19 @@
 <div class="max-w-7xl mx-auto">
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Solicitudes de Cotización</h1>
+            <h1 class="text-3xl font-bold text-gray-800">Solicitudes de Cotizacion</h1>
             <p class="text-gray-600 mt-1">Cotizaciones enviadas a proveedores</p>
         </div>
-        <a href="{{ route('solicitudes-presupuesto.create') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+        <a href="{{ route('solicitudes-presupuesto.create') }}" class="btn-primary">
             + Nueva Solicitud
         </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-        <form action="{{ route('solicitudes-presupuesto.index') }}" method="GET" class="flex gap-4 items-end">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                <select name="estado" class="rounded-lg border-gray-300 shadow-sm">
+    <div class="form-section mb-6">
+        <form action="{{ route('solicitudes-presupuesto.index') }}" method="GET" class="flex flex-wrap gap-4 items-end">
+            <div class="w-48">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-select">
                     <option value="">Todos</option>
                     <option value="ENVIADA" {{ request('estado') == 'ENVIADA' ? 'selected' : '' }}>Enviada</option>
                     <option value="VISTA" {{ request('estado') == 'VISTA' ? 'selected' : '' }}>Vista</option>
@@ -26,9 +26,9 @@
                     <option value="RECHAZADA" {{ request('estado') == 'RECHAZADA' ? 'selected' : '' }}>Rechazada</option>
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
-                <select name="proveedor_id" class="rounded-lg border-gray-300 shadow-sm">
+            <div class="w-64">
+                <label class="form-label">Proveedor</label>
+                <select name="proveedor_id" class="form-select">
                     <option value="">Todos</option>
                     @foreach($proveedores as $prov)
                         <option value="{{ $prov->id }}" {{ request('proveedor_id') == $prov->id ? 'selected' : '' }}>
@@ -37,73 +37,73 @@
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Filtrar</button>
-            <a href="{{ route('solicitudes-presupuesto.index') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Limpiar</a>
+            <button type="submit" class="btn-primary">Filtrar</button>
+            <a href="{{ route('solicitudes-presupuesto.index') }}" class="btn-secondary">Limpiar</a>
         </form>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Número</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Proveedor</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pedido Cliente</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Cotizado</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acción</th>
+                    <th>Numero</th>
+                    <th>Proveedor</th>
+                    <th>Pedido Cliente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th class="text-right">Total Cotizado</th>
+                    <th class="text-center">Accion</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody>
                 @forelse($solicitudes as $solicitud)
                     <tr class="{{ $solicitud->estado == 'COTIZADA' ? 'bg-green-50' : '' }}">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{{ route('solicitudes-presupuesto.show', $solicitud) }}" class="text-blue-600 hover:text-blue-900 font-medium">
+                        <td>
+                            <a href="{{ route('solicitudes-presupuesto.show', $solicitud) }}" class="text-blue-600 hover:text-blue-900 font-bold">
                                 {{ $solicitud->numero }}
                             </a>
                         </td>
-                        <td class="px-6 py-4">{{ $solicitud->proveedor->razon_social }}</td>
-                        <td class="px-6 py-4">
+                        <td class="font-medium">{{ $solicitud->proveedor->razon_social }}</td>
+                        <td>
                             @if($solicitud->pedidoCliente)
-                                <a href="{{ route('pedidos-cliente.show', $solicitud->pedidoCliente) }}" class="text-blue-600 hover:underline">
+                                <a href="{{ route('pedidos-cliente.show', $solicitud->pedidoCliente) }}" class="text-blue-600 hover:underline font-medium">
                                     {{ $solicitud->pedidoCliente->numero }}
                                 </a>
                             @else
-                                -
+                                <span class="text-gray-400">-</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td class="whitespace-nowrap">
                             {{ $solicitud->fecha_solicitud->format('d/m/Y') }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs rounded-full {{ $solicitud->estado_color }}">
+                        <td>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full {{ $solicitud->estado_color }}">
                                 {{ str_replace('_', ' ', $solicitud->estado) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <td class="text-right font-bold whitespace-nowrap">
                             @if($solicitud->total_cotizado)
                                 {{ number_format($solicitud->total_cotizado, 0, ',', '.') }} Gs.
                             @else
-                                -
+                                <span class="text-gray-400">-</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <td class="text-center">
                             @if($solicitud->estado == 'COTIZADA')
                                 <form action="{{ route('solicitudes-presupuesto.aceptar', $solicitud) }}" method="POST" class="inline">
                                     @csrf
-                                    <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                    <button type="submit" class="btn-success text-sm px-3 py-1">
                                         Aceptar
                                     </button>
                                 </form>
                             @else
-                                <a href="{{ route('solicitudes-presupuesto.show', $solicitud) }}" class="text-blue-600 hover:underline">Ver</a>
+                                <a href="{{ route('solicitudes-presupuesto.show', $solicitud) }}" class="text-blue-600 hover:underline font-medium">Ver</a>
                             @endif
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay solicitudes</td>
+                        <td colspan="7" class="text-center py-8 text-gray-500">No hay solicitudes</td>
                     </tr>
                 @endforelse
             </tbody>
