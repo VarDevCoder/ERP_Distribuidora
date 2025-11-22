@@ -20,30 +20,43 @@
                 </div>
 
                 <!-- Menú de Navegación -->
-                <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-4">
+                    <!-- FLUJO ANKOR -->
+                    <a href="{{ route('pedidos-cliente.index') }}"
+                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                              {{ request()->routeIs('pedidos-cliente.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                        Pedidos
+                    </a>
+                    <a href="{{ route('ordenes-compra.index') }}"
+                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                              {{ request()->routeIs('ordenes-compra.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                        Compras
+                    </a>
+                    <a href="{{ route('ordenes-envio.index') }}"
+                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
+                              {{ request()->routeIs('ordenes-envio.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
+                        Envíos
+                    </a>
+                    <span class="text-blue-600">|</span>
+                    <!-- MÓDULOS BASE -->
                     <a href="{{ route('presupuestos.index') }}"
                        class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
                               {{ request()->routeIs('presupuestos.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        📋 Presupuestos
-                    </a>
-                    <a href="{{ route('notas-remision.index') }}"
-                       class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
-                              {{ request()->routeIs('notas-remision.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        📦 Notas Remisión
+                        Presupuestos
                     </a>
                     <a href="{{ route('inventario.index') }}"
                        class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
                               {{ request()->routeIs('inventario.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        📊 Inventario
+                        Inventario
                     </a>
                     <a href="{{ route('productos.index') }}"
                        class="text-blue-100 hover:text-white px-3 py-2 text-sm font-medium transition
                               {{ request()->routeIs('productos.*') ? 'text-white bg-blue-700 rounded-lg' : '' }}">
-                        🏷️ Productos
+                        Productos
                     </a>
-                    <a href="{{ route('presupuestos.create') }}"
+                    <a href="{{ route('pedidos-cliente.create') }}"
                        class="bg-yellow-500 text-blue-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-yellow-400 transition shadow-md">
-                        + Nuevo Presupuesto
+                        + Nuevo Pedido
                     </a>
 
                     <!-- User Menu -->

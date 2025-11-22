@@ -8,6 +8,9 @@ use App\Http\Controllers\NotaRemisionController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\CompraController;
+use App\Http\Controllers\PedidoClienteController;
+use App\Http\Controllers\OrdenCompraController;
+use App\Http\Controllers\OrdenEnvioController;
 
 // Authentication Routes
 Route::get('/', function () {
@@ -50,4 +53,33 @@ Route::middleware('auth')->group(function () {
     // Compras - Documentos
     Route::post('/compras/{presupuesto}/remision', [CompraController::class, 'registrarRemision'])->name('compras.registrar-remision');
     Route::post('/compras/{presupuesto}/contrafactura', [CompraController::class, 'registrarContrafactura'])->name('compras.registrar-contrafactura');
+
+    // ============================================
+    // FLUJO ANKOR - Pedidos de Clientes
+    // ============================================
+    Route::resource('pedidos-cliente', PedidoClienteController::class);
+    Route::post('pedidos-cliente/{pedido}/procesar', [PedidoClienteController::class, 'procesar'])->name('pedidos-cliente.procesar');
+    Route::post('pedidos-cliente/{pedido}/cancelar', [PedidoClienteController::class, 'cancelar'])->name('pedidos-cliente.cancelar');
+    Route::post('pedidos-cliente/{pedido}/mercaderia-recibida', [PedidoClienteController::class, 'marcarMercaderiaRecibida'])->name('pedidos-cliente.mercaderia-recibida');
+
+    // ============================================
+    // FLUJO ANKOR - Órdenes de Compra a Proveedores
+    // ============================================
+    Route::resource('ordenes-compra', OrdenCompraController::class);
+    Route::post('ordenes-compra/{orden}/enviar', [OrdenCompraController::class, 'enviar'])->name('ordenes-compra.enviar');
+    Route::post('ordenes-compra/{orden}/confirmar', [OrdenCompraController::class, 'confirmar'])->name('ordenes-compra.confirmar');
+    Route::post('ordenes-compra/{orden}/en-transito', [OrdenCompraController::class, 'enTransito'])->name('ordenes-compra.en-transito');
+    Route::get('ordenes-compra/{orden}/recepcion', [OrdenCompraController::class, 'formRecepcion'])->name('ordenes-compra.form-recepcion');
+    Route::post('ordenes-compra/{orden}/recibir', [OrdenCompraController::class, 'recibirMercaderia'])->name('ordenes-compra.recibir');
+    Route::post('ordenes-compra/{orden}/cancelar', [OrdenCompraController::class, 'cancelar'])->name('ordenes-compra.cancelar');
+
+    // ============================================
+    // FLUJO ANKOR - Órdenes de Envío a Clientes
+    // ============================================
+    Route::resource('ordenes-envio', OrdenEnvioController::class)->except(['edit', 'update']);
+    Route::post('ordenes-envio/{orden}/lista-despachar', [OrdenEnvioController::class, 'listaDespachar'])->name('ordenes-envio.lista-despachar');
+    Route::post('ordenes-envio/{orden}/despachar', [OrdenEnvioController::class, 'despachar'])->name('ordenes-envio.despachar');
+    Route::post('ordenes-envio/{orden}/entregar', [OrdenEnvioController::class, 'entregar'])->name('ordenes-envio.entregar');
+    Route::post('ordenes-envio/{orden}/devolver', [OrdenEnvioController::class, 'devolver'])->name('ordenes-envio.devolver');
+    Route::post('ordenes-envio/{orden}/cancelar', [OrdenEnvioController::class, 'cancelar'])->name('ordenes-envio.cancelar');
 });
