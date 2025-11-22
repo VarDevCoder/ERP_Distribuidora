@@ -1,60 +1,70 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-6xl mx-auto">
+<div class="max-w-7xl mx-auto">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Proveedores</h1>
-        <a href="{{ route('proveedores.create') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Proveedores</h1>
+            <p class="text-gray-600 mt-1">Gestiona los proveedores del sistema</p>
+        </div>
+        <a href="{{ route('proveedores.create') }}" class="btn-primary">
             + Nuevo Proveedor
         </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-        <form action="{{ route('proveedores.index') }}" method="GET" class="flex gap-4">
-            <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por nombre o RUC..."
-                   class="flex-1 rounded-lg border-gray-300 shadow-sm">
-            <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Buscar</button>
+    <div class="form-section mb-6">
+        <form action="{{ route('proveedores.index') }}" method="GET" class="flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[250px]">
+                <label class="form-label">Buscar</label>
+                <input type="text" name="buscar" value="{{ request('buscar') }}"
+                       placeholder="Buscar por nombre o RUC..."
+                       class="form-input">
+            </div>
+            <button type="submit" class="btn-primary">Buscar</button>
+            <a href="{{ route('proveedores.index') }}" class="btn-secondary">Limpiar</a>
         </form>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Proveedor</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">RUC</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contacto</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    <th>Proveedor</th>
+                    <th>RUC</th>
+                    <th>Contacto</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody>
                 @forelse($proveedores as $proveedor)
                     <tr>
-                        <td class="px-6 py-4">
-                            <div class="font-medium">{{ $proveedor->razon_social }}</div>
-                            <div class="text-sm text-gray-500">{{ $proveedor->user->email }}</div>
+                        <td>
+                            <div class="font-bold text-gray-900">{{ $proveedor->razon_social }}</div>
+                            <div class="text-xs text-gray-500">{{ $proveedor->user->email }}</div>
                         </td>
-                        <td class="px-6 py-4">{{ $proveedor->ruc }}</td>
-                        <td class="px-6 py-4 text-sm">
-                            {{ $proveedor->telefono ?? '-' }}<br>
-                            {{ $proveedor->ciudad ?? '' }}
+                        <td class="font-mono">{{ $proveedor->ruc }}</td>
+                        <td>
+                            <div>{{ $proveedor->telefono ?? '-' }}</div>
+                            <div class="text-xs text-gray-500">{{ $proveedor->ciudad ?? '' }}</div>
                         </td>
-                        <td class="px-6 py-4">
+                        <td>
                             @if($proveedor->user->activo)
-                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Activo</span>
+                                <span class="px-3 py-1 text-xs font-bold rounded-full bg-green-200 text-green-800">Activo</span>
                             @else
-                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Inactivo</span>
+                                <span class="px-3 py-1 text-xs font-bold rounded-full bg-red-200 text-red-800">Inactivo</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-center space-x-2">
-                            <a href="{{ route('proveedores.show', $proveedor) }}" class="text-blue-600 hover:underline">Ver</a>
-                            <a href="{{ route('proveedores.edit', $proveedor) }}" class="text-yellow-600 hover:underline">Editar</a>
+                        <td class="text-center">
+                            <div class="flex justify-center space-x-3">
+                                <a href="{{ route('proveedores.show', $proveedor) }}" class="text-blue-600 hover:text-blue-900 font-medium">Ver</a>
+                                <a href="{{ route('proveedores.edit', $proveedor) }}" class="text-yellow-600 hover:text-yellow-900 font-medium">Editar</a>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay proveedores registrados</td>
+                        <td colspan="5" class="text-center py-8 text-gray-500">No hay proveedores registrados</td>
                     </tr>
                 @endforelse
             </tbody>

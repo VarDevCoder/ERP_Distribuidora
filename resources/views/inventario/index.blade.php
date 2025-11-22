@@ -8,30 +8,27 @@
             <h1 class="text-3xl font-bold text-gray-800">Inventario</h1>
             <p class="text-gray-600 mt-1">Estado actual de stocks y productos</p>
         </div>
-        <a href="{{ route('inventario.movimientos') }}"
-           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <a href="{{ route('inventario.movimientos') }}" class="btn-primary">
             Ver Todos los Movimientos
         </a>
     </div>
 
-    <!-- Resumen de Estadísticas -->
+    <!-- Resumen de Estadisticas -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <!-- Total Productos -->
-        <div class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg shadow-lg p-6 border-2 border-blue-300">
+        <div class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg shadow-lg p-6 border-2 border-blue-400">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-blue-700">Total Productos</p>
+                    <p class="text-sm font-bold text-blue-700">Total Productos</p>
                     <p class="text-3xl font-bold text-blue-900 mt-2">{{ $productos->total() }}</p>
                 </div>
                 <div class="text-4xl">📦</div>
             </div>
         </div>
 
-        <!-- Productos con Stock Bajo -->
-        <div class="bg-gradient-to-br from-red-100 to-red-50 rounded-lg shadow-lg p-6 border-2 border-red-300">
+        <div class="bg-gradient-to-br from-red-100 to-red-50 rounded-lg shadow-lg p-6 border-2 border-red-400">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-red-700">Stock Bajo</p>
+                    <p class="text-sm font-bold text-red-700">Stock Bajo</p>
                     <p class="text-3xl font-bold text-red-700 mt-2">
                         {{ $productos->filter(fn($p) => $p->stock_actual <= $p->stock_minimo)->count() }}
                     </p>
@@ -40,11 +37,10 @@
             </div>
         </div>
 
-        <!-- Total Movimientos -->
-        <div class="bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg shadow-lg p-6 border-2 border-purple-300">
+        <div class="bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg shadow-lg p-6 border-2 border-purple-400">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-purple-700">Movimientos (Todos)</p>
+                    <p class="text-sm font-bold text-purple-700">Movimientos (Todos)</p>
                     <p class="text-3xl font-bold text-purple-900 mt-2">
                         {{ $productos->sum('movimientos_count') }}
                     </p>
@@ -53,11 +49,10 @@
             </div>
         </div>
 
-        <!-- Productos Activos -->
-        <div class="bg-gradient-to-br from-green-100 to-green-50 rounded-lg shadow-lg p-6 border-2 border-green-300">
+        <div class="bg-gradient-to-br from-green-100 to-green-50 rounded-lg shadow-lg p-6 border-2 border-green-400">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-green-700">Activos</p>
+                    <p class="text-sm font-bold text-green-700">Activos</p>
                     <p class="text-3xl font-bold text-green-700 mt-2">
                         {{ $productos->filter(fn($p) => $p->activo)->count() }}
                     </p>
@@ -68,69 +63,75 @@
     </div>
 
     <!-- Tabla de Inventario -->
-    <x-data-table :headers="['Producto', 'Stock Actual', 'Stock Mínimo', 'Estado', 'Movimientos', 'Acciones']" color="indigo">
-        @forelse($productos as $producto)
-            <x-table-row :color="$producto->stock_actual <= $producto->stock_minimo ? 'yellow' : 'indigo'">
-                <x-table-cell class="whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div>
-                            <div class="text-sm font-medium text-gray-900">{{ $producto->nombre }}</div>
-                            <div class="text-sm text-gray-500">{{ $producto->codigo }}</div>
-                        </div>
-                    </div>
-                </x-table-cell>
-                <x-table-cell class="whitespace-nowrap">
-                    <div class="text-sm font-bold {{ $producto->stock_actual <= $producto->stock_minimo ? 'text-red-600' : 'text-gray-900' }}">
-                        {{ $producto->stock_actual }} {{ $producto->unidad_medida }}
-                    </div>
-                </x-table-cell>
-                <x-table-cell class="whitespace-nowrap text-sm text-gray-500">
-                    {{ $producto->stock_minimo }} {{ $producto->unidad_medida }}
-                </x-table-cell>
-                <x-table-cell class="whitespace-nowrap">
-                    @if($producto->stock_actual <= $producto->stock_minimo)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            Stock Bajo
-                        </span>
-                    @elseif($producto->stock_actual <= ($producto->stock_minimo * 1.5))
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            Alerta
-                        </span>
-                    @else
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Normal
-                        </span>
-                    @endif
-                </x-table-cell>
-                <x-table-cell class="whitespace-nowrap text-sm text-gray-500">
-                    {{ $producto->movimientos_count }} movimientos
-                </x-table-cell>
-                <x-table-cell :last="true" class="whitespace-nowrap text-sm font-medium">
-                    <div class="flex space-x-2">
-                        <a href="{{ route('inventario.kardex', $producto) }}" class="text-blue-600 hover:text-blue-900">Kardex</a>
-                        <a href="{{ route('productos.show', $producto) }}" class="text-green-600 hover:text-green-900">Ver Producto</a>
-                    </div>
-                </x-table-cell>
-            </x-table-row>
-        @empty
-            <tr>
-                <td colspan="6" class="px-6 py-12 text-center">
-                    <div class="text-gray-400 text-lg">
-                        <p class="mb-2">No hay productos en el inventario</p>
-                        <a href="{{ route('productos.create') }}" class="text-blue-600 hover:text-blue-800">
-                            Crear primer producto
-                        </a>
-                    </div>
-                </td>
-            </tr>
-        @endforelse
-    </x-data-table>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th class="text-right">Stock Actual</th>
+                    <th class="text-right">Stock Minimo</th>
+                    <th>Estado</th>
+                    <th class="text-center">Movimientos</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($productos as $producto)
+                    <tr class="{{ $producto->stock_actual <= $producto->stock_minimo ? 'bg-red-50' : '' }}">
+                        <td>
+                            <div class="font-bold text-gray-900">{{ $producto->nombre }}</div>
+                            <div class="text-xs text-gray-500">{{ $producto->codigo }}</div>
+                        </td>
+                        <td class="text-right">
+                            <span class="font-bold {{ $producto->stock_actual <= $producto->stock_minimo ? 'text-red-600' : 'text-gray-900' }}">
+                                {{ number_format($producto->stock_actual, 2) }} {{ $producto->unidad_medida }}
+                            </span>
+                        </td>
+                        <td class="text-right text-gray-600">
+                            {{ number_format($producto->stock_minimo, 2) }} {{ $producto->unidad_medida }}
+                        </td>
+                        <td>
+                            @if($producto->stock_actual <= $producto->stock_minimo)
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800">
+                                    Stock Bajo
+                                </span>
+                            @elseif($producto->stock_actual <= ($producto->stock_minimo * 1.5))
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-yellow-200 text-yellow-800">
+                                    Alerta
+                                </span>
+                            @else
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-200 text-green-800">
+                                    Normal
+                                </span>
+                            @endif
+                        </td>
+                        <td class="text-center text-gray-600">
+                            {{ $producto->movimientos_count }} mov.
+                        </td>
+                        <td class="text-center">
+                            <div class="flex justify-center space-x-3">
+                                <a href="{{ route('inventario.kardex', $producto) }}" class="text-blue-600 hover:text-blue-900 font-medium">Kardex</a>
+                                <a href="{{ route('productos.show', $producto) }}" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-gray-500">
+                            No hay productos en el inventario
+                            <br>
+                            <a href="{{ route('productos.create') }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                Crear primer producto
+                            </a>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
-    <!-- Paginación -->
     @if($productos->hasPages())
-        <div class="mt-6">
-            {{ $productos->links() }}
-        </div>
+        <div class="mt-4">{{ $productos->links() }}</div>
     @endif
 </div>
 @endsection
