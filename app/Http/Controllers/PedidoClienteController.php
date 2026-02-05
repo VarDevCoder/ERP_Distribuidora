@@ -2,24 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use App\Models\PedidoCliente;
 use App\Models\PedidoClienteItem;
 use App\Models\Producto;
+use App\Models\Proveedor;
+use App\Models\ProveedorProducto;
+use App\Models\SolicitudPresupuesto;
+use App\Models\SolicitudPresupuestoItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PedidoClienteController extends Controller
 {
-    /**
-     * Listar todos los pedidos
-     */
     public function index(Request $request)
     {
         $query = PedidoCliente::with(['items.producto', 'usuario'])
             ->orderBy('created_at', 'desc');
 
-        // Filtros
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
@@ -38,21 +40,17 @@ class PedidoClienteController extends Controller
         return view('pedidos-cliente.index', compact('pedidos'));
     }
 
-    /**
-     * Formulario de creación
-     */
     public function create()
     {
-        $productos = Producto::orderBy('nombre')->get();
-        return view('pedidos-cliente.create', compact('productos'));
+        $clientes = Cliente::active()->orderBy('nombre')->get();
+        $productos = Producto::active()->with('categoria')->orderBy('nombre')->get()->groupBy(fn($p) => $p->categoria?->nombre ?? 'Sin Categoría');
+        return view('pedidos-cliente.create', compact('clientes', 'productos'));
     }
 
-    /**
-     * Guardar nuevo pedido
-     */
     public function store(Request $request)
     {
         $request->validate([
+            'cliente_id' => 'nullable|exists:clientes,id',
             'cliente_nombre' => 'required|string|max:255',
             'cliente_ruc' => 'nullable|string|max:50',
             'cliente_telefono' => 'nullable|string|max:50',
@@ -69,19 +67,38 @@ class PedidoClienteController extends Controller
 
         DB::beginTransaction();
         try {
-            $pedido = PedidoCliente::create([
+            // Si se seleccionó un cliente, obtener sus datos para snapshot
+            $clienteData = [
+                'cliente_id' => $request->cliente_id,
                 'cliente_nombre' => $request->cliente_nombre,
                 'cliente_ruc' => $request->cliente_ruc,
                 'cliente_telefono' => $request->cliente_telefono,
                 'cliente_email' => $request->cliente_email,
                 'cliente_direccion' => $request->cliente_direccion,
+            ];
+
+            // Si hay cliente_id, sobrescribir con datos actuales del cliente
+            if ($request->cliente_id) {
+                $cliente = Cliente::find($request->cliente_id);
+                if ($cliente) {
+                    $clienteData = array_merge($clienteData, [
+                        'cliente_nombre' => $cliente->nombre,
+                        'cliente_ruc' => $cliente->ruc,
+                        'cliente_telefono' => $cliente->telefono,
+                        'cliente_email' => $cliente->email,
+                        'cliente_direccion' => $cliente->direccion,
+                    ]);
+                }
+            }
+
+            $pedido = PedidoCliente::create(array_merge($clienteData, [
                 'fecha_pedido' => $request->fecha_pedido,
                 'fecha_entrega_solicitada' => $request->fecha_entrega_solicitada,
                 'notas' => $request->notas,
                 'estado' => PedidoCliente::ESTADO_RECIBIDO,
                 'descuento' => $request->descuento ?? 0,
                 'usuario_id' => Auth::id(),
-            ]);
+            ]));
 
             foreach ($request->items as $item) {
                 PedidoClienteItem::create([
@@ -92,51 +109,96 @@ class PedidoClienteController extends Controller
                 ]);
             }
 
+            $pedido->load('items');
+            $pedido->calcularTotales();
+
             DB::commit();
             return redirect()
                 ->route('pedidos-cliente.show', $pedido)
-                ->with('success', "Pedido {$pedido->numero} creado exitosamente");
+                ->with('success', "Solicitud {$pedido->numero} creada exitosamente");
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al crear el pedido: ' . $e->getMessage());
+            Log::error('Error al crear solicitud', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al crear la solicitud. Intente nuevamente.');
         }
     }
 
-    /**
-     * Ver detalle del pedido
-     */
-    public function show(PedidoCliente $pedidosCliente)
+    public function show(PedidoCliente $pedidoCliente)
     {
-        $pedido = $pedidosCliente->load(['items.producto', 'ordenesCompra', 'ordenEnvio', 'usuario']);
-        return view('pedidos-cliente.show', compact('pedido'));
-    }
+        $pedido = $pedidoCliente->load([
+            'items.producto',
+            'ordenesCompra',
+            'ordenEnvio',
+            'usuario',
+            'solicitudesPresupuesto.proveedor',
+            'solicitudesPresupuesto.items.producto',
+        ]);
 
-    /**
-     * Formulario de edición
-     */
-    public function edit(PedidoCliente $pedidosCliente)
-    {
-        $pedido = $pedidosCliente;
-        if (!$pedido->puedeSerCancelado()) {
-            return back()->with('error', 'Este pedido no puede ser editado');
+        $cotizacionesCotizadas = $pedido->solicitudesPresupuesto
+            ->where('estado', SolicitudPresupuesto::ESTADO_COTIZADA);
+
+        // Obtener comparación de precios del catálogo de proveedores
+        $productosIds = $pedido->items->pluck('producto_id')->toArray();
+
+        $preciosCatalogo = ProveedorProducto::whereIn('producto_id', $productosIds)
+            ->where('disponible', true)
+            ->with(['proveedor.user', 'producto'])
+            ->get()
+            ->groupBy('producto_id');
+
+        // Construir matriz de comparación desde catálogo
+        $comparacionCatalogo = [];
+        $proveedoresEnCatalogo = collect();
+
+        foreach ($pedido->items as $item) {
+            $preciosProducto = $preciosCatalogo->get($item->producto_id, collect());
+
+            foreach ($preciosProducto as $pp) {
+                if ($pp->proveedor && $pp->proveedor->user && $pp->proveedor->user->activo) {
+                    $proveedoresEnCatalogo->put($pp->proveedor_id, $pp->proveedor);
+
+                    if (!isset($comparacionCatalogo[$item->producto_id])) {
+                        $comparacionCatalogo[$item->producto_id] = [
+                            'producto' => $item->producto,
+                            'cantidad' => $item->cantidad,
+                            'precios' => [],
+                        ];
+                    }
+
+                    $comparacionCatalogo[$item->producto_id]['precios'][$pp->proveedor_id] = [
+                        'precio' => $pp->precio,
+                        'tiempo_entrega' => $pp->tiempo_entrega_dias,
+                        'disponible' => $pp->disponible,
+                    ];
+                }
+            }
         }
 
-        $productos = Producto::orderBy('nombre')->get();
-        return view('pedidos-cliente.edit', compact('pedido', 'productos'));
+        return view('pedidos-cliente.show', compact('pedido', 'cotizacionesCotizadas', 'comparacionCatalogo', 'proveedoresEnCatalogo'));
     }
 
-    /**
-     * Actualizar pedido
-     */
-    public function update(Request $request, PedidoCliente $pedidosCliente)
+    public function edit(PedidoCliente $pedidoCliente)
     {
-        $pedido = $pedidosCliente;
+        $pedido = $pedidoCliente;
         if (!$pedido->puedeSerCancelado()) {
-            return back()->with('error', 'Este pedido no puede ser modificado');
+            return back()->with('error', 'Esta solicitud no puede ser editada');
+        }
+
+        $clientes = Cliente::active()->orderBy('nombre')->get();
+        $productos = Producto::active()->with('categoria')->orderBy('nombre')->get()->groupBy(fn($p) => $p->categoria?->nombre ?? 'Sin Categoría');
+        return view('pedidos-cliente.edit', compact('pedido', 'clientes', 'productos'));
+    }
+
+    public function update(Request $request, PedidoCliente $pedidoCliente)
+    {
+        $pedido = $pedidoCliente;
+        if (!$pedido->puedeSerCancelado()) {
+            return back()->with('error', 'Esta solicitud no puede ser modificada');
         }
 
         $request->validate([
+            'cliente_id' => 'nullable|exists:clientes,id',
             'cliente_nombre' => 'required|string|max:255',
             'cliente_ruc' => 'nullable|string|max:50',
             'cliente_telefono' => 'nullable|string|max:50',
@@ -152,18 +214,36 @@ class PedidoClienteController extends Controller
 
         DB::beginTransaction();
         try {
-            $pedido->update([
+            // Si se seleccionó un cliente, obtener sus datos para snapshot
+            $clienteData = [
+                'cliente_id' => $request->cliente_id,
                 'cliente_nombre' => $request->cliente_nombre,
                 'cliente_ruc' => $request->cliente_ruc,
                 'cliente_telefono' => $request->cliente_telefono,
                 'cliente_email' => $request->cliente_email,
                 'cliente_direccion' => $request->cliente_direccion,
+            ];
+
+            // Si hay cliente_id, sobrescribir con datos actuales del cliente
+            if ($request->cliente_id) {
+                $cliente = Cliente::find($request->cliente_id);
+                if ($cliente) {
+                    $clienteData = array_merge($clienteData, [
+                        'cliente_nombre' => $cliente->nombre,
+                        'cliente_ruc' => $cliente->ruc,
+                        'cliente_telefono' => $cliente->telefono,
+                        'cliente_email' => $cliente->email,
+                        'cliente_direccion' => $cliente->direccion,
+                    ]);
+                }
+            }
+
+            $pedido->update(array_merge($clienteData, [
                 'fecha_entrega_solicitada' => $request->fecha_entrega_solicitada,
                 'notas' => $request->notas,
                 'descuento' => $request->descuento ?? 0,
-            ]);
+            ]));
 
-            // Eliminar items anteriores y crear nuevos
             $pedido->items()->delete();
 
             foreach ($request->items as $item) {
@@ -175,25 +255,26 @@ class PedidoClienteController extends Controller
                 ]);
             }
 
+            $pedido->load('items');
+            $pedido->calcularTotales();
+
             DB::commit();
             return redirect()
                 ->route('pedidos-cliente.show', $pedido)
-                ->with('success', 'Pedido actualizado exitosamente');
+                ->with('success', 'Solicitud actualizada exitosamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al actualizar el pedido: ' . $e->getMessage());
+            Log::error('Error al actualizar solicitud', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al actualizar la solicitud. Intente nuevamente.');
         }
     }
 
-    /**
-     * Eliminar pedido
-     */
-    public function destroy(PedidoCliente $pedidosCliente)
+    public function destroy(PedidoCliente $pedidoCliente)
     {
-        $pedido = $pedidosCliente;
+        $pedido = $pedidoCliente;
         if (!$pedido->puedeSerCancelado()) {
-            return back()->with('error', 'Este pedido no puede ser eliminado');
+            return back()->with('error', 'Esta solicitud no puede ser eliminada');
         }
 
         $numero = $pedido->numero;
@@ -201,32 +282,26 @@ class PedidoClienteController extends Controller
 
         return redirect()
             ->route('pedidos-cliente.index')
-            ->with('success', "Pedido {$numero} eliminado exitosamente");
+            ->with('success', "Solicitud {$numero} eliminada exitosamente");
     }
 
-    /**
-     * Cambiar estado: Procesar pedido (iniciar flujo)
-     */
     public function procesar(PedidoCliente $pedido)
     {
         if ($pedido->estado !== PedidoCliente::ESTADO_RECIBIDO) {
-            return back()->with('error', 'Solo se pueden procesar pedidos recién recibidos');
+            return back()->with('error', 'Solo se pueden procesar solicitudes recién recibidas');
         }
 
         $pedido->update(['estado' => PedidoCliente::ESTADO_EN_PROCESO]);
 
         return redirect()
             ->route('pedidos-cliente.show', $pedido)
-            ->with('success', 'Pedido marcado como en proceso. Ahora puede generar órdenes de compra a proveedores.');
+            ->with('success', 'Solicitud marcada como en proceso. Ahora puede solicitar cotizaciones a proveedores.');
     }
 
-    /**
-     * Cancelar pedido
-     */
     public function cancelar(Request $request, PedidoCliente $pedido)
     {
         if (!$pedido->puedeSerCancelado()) {
-            return back()->with('error', 'Este pedido no puede ser cancelado');
+            return back()->with('error', 'Esta solicitud no puede ser cancelada');
         }
 
         $request->validate([
@@ -240,16 +315,13 @@ class PedidoClienteController extends Controller
 
         return redirect()
             ->route('pedidos-cliente.show', $pedido)
-            ->with('success', 'Pedido cancelado exitosamente');
+            ->with('success', 'Solicitud cancelada exitosamente');
     }
 
-    /**
-     * Marcar mercadería como recibida (del proveedor)
-     */
     public function marcarMercaderiaRecibida(PedidoCliente $pedido)
     {
         if ($pedido->estado !== PedidoCliente::ESTADO_ORDEN_COMPRA) {
-            return back()->with('error', 'El pedido debe tener orden de compra activa');
+            return back()->with('error', 'La solicitud debe tener orden de compra activa');
         }
 
         $pedido->update(['estado' => PedidoCliente::ESTADO_MERCADERIA_RECIBIDA]);
@@ -257,5 +329,74 @@ class PedidoClienteController extends Controller
         return redirect()
             ->route('pedidos-cliente.show', $pedido)
             ->with('success', 'Mercadería marcada como recibida. Ahora puede generar la orden de envío.');
+    }
+
+    public function solicitarCotizacionTodos(PedidoCliente $pedido)
+    {
+        if (!in_array($pedido->estado, [PedidoCliente::ESTADO_RECIBIDO, PedidoCliente::ESTADO_EN_PROCESO, PedidoCliente::ESTADO_PRESUPUESTADO])) {
+            return back()->with('error', 'La solicitud no está en un estado válido para cotizar.');
+        }
+
+        $proveedores = Proveedor::whereHas('user', fn($q) => $q->where('activo', true))->get();
+
+        if ($proveedores->isEmpty()) {
+            return back()->with('error', 'No hay proveedores activos en el sistema.');
+        }
+
+        $pedido->load('items');
+
+        DB::beginTransaction();
+        try {
+            $creadas = 0;
+
+            foreach ($proveedores as $proveedor) {
+                $yaExiste = SolicitudPresupuesto::where('pedido_cliente_id', $pedido->id)
+                    ->where('proveedor_id', $proveedor->id)
+                    ->whereNotIn('estado', [SolicitudPresupuesto::ESTADO_RECHAZADA, SolicitudPresupuesto::ESTADO_VENCIDA])
+                    ->exists();
+
+                if ($yaExiste) {
+                    continue;
+                }
+
+                $solicitud = SolicitudPresupuesto::create([
+                    'pedido_cliente_id' => $pedido->id,
+                    'proveedor_id' => $proveedor->id,
+                    'usuario_id' => Auth::id(),
+                    'fecha_solicitud' => now(),
+                    'estado' => SolicitudPresupuesto::ESTADO_ENVIADA,
+                    'mensaje_solicitud' => "Solicitud de cotización generada automáticamente desde {$pedido->numero}.",
+                ]);
+
+                foreach ($pedido->items as $item) {
+                    SolicitudPresupuestoItem::create([
+                        'solicitud_presupuesto_id' => $solicitud->id,
+                        'producto_id' => $item->producto_id,
+                        'cantidad_solicitada' => $item->cantidad,
+                    ]);
+                }
+
+                $creadas++;
+            }
+
+            if ($pedido->estado === PedidoCliente::ESTADO_RECIBIDO) {
+                $pedido->update(['estado' => PedidoCliente::ESTADO_EN_PROCESO]);
+            }
+
+            DB::commit();
+
+            if ($creadas === 0) {
+                return back()->with('error', 'Ya existen cotizaciones activas para todos los proveedores.');
+            }
+
+            return redirect()
+                ->route('pedidos-cliente.show', $pedido)
+                ->with('success', "Se enviaron {$creadas} solicitudes de cotización a proveedores.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al solicitar cotización masiva', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al enviar las solicitudes. Intente nuevamente.');
+        }
     }
 }

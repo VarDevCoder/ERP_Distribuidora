@@ -1,0 +1,152 @@
+/* ============================================
+   BUTTONS - Modern & Tactile
+   Premium feel with subtle depth
+   ============================================ */
+
+/* Primary - Main actions */
+.btn-primary {
+    @apply bg-linear-to-b from-sky-500 to-sky-600
+           text-white px-5 py-2.5 rounded-xl font-semibold
+           hover:from-sky-600 hover:to-sky-700
+           active:from-sky-700 active:to-sky-800
+           focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2
+           transition-all duration-200
+           inline-flex items-center justify-center gap-2;
+    box-shadow:
+        0 1px 2px 0 rgb(0 0 0 / 0.05),
+        inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+        0 0 0 1px rgb(14 165 233 / 0.1);
+}
+
+.btn-primary:hover {
+    box-shadow:
+        0 4px 12px -2px rgb(14 165 233 / 0.4),
+        inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+        0 0 0 1px rgb(14 165 233 / 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow:
+        0 1px 2px 0 rgb(0 0 0 / 0.1),
+        inset 0 2px 4px 0 rgb(0 0 0 / 0.1);
+}
+
+/* Secondary - Alternative actions */
+.btn-secondary {
+    @apply bg-white text-slate-700 px-5 py-2.5 rounded-xl font-semibold
+           hover:bg-slate-50
+           active:bg-slate-100
+           focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2
+           transition-all duration-200
+           border border-slate-200
+           inline-flex items-center justify-center gap-2;
+    box-shadow:
+        0 1px 2px 0 rgb(0 0 0 / 0.04),
+        0 0 0 1px rgb(148 163 184 / 0.1);
+}
+
+.btn-secondary:hover {
+    @apply border-slate-300;
+    box-shadow:
+        0 2px 4px -1px rgb(0 0 0 / 0.06),
+        0 0 0 1px rgb(148 163 184 / 0.15);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Success - Positive actions */
+.btn-success {
+    @apply bg-linear-to-b from-emerald-500 to-emerald-600
+           text-white px-5 py-2.5 rounded-xl font-semibold
+           hover:from-emerald-600 hover:to-emerald-700
+           active:from-emerald-700 active:to-emerald-800
+           focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2
+           transition-all duration-200
+           inline-flex items-center justify-center gap-2;
+    box-shadow:
+        0 1px 2px 0 rgb(0 0 0 / 0.05),
+        inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+        0 0 0 1px rgb(16 185 129 / 0.1);
+}
+
+.btn-success:hover {
+    box-shadow:
+        0 4px 12px -2px rgb(16 185 129 / 0.4),
+        inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+        0 0 0 1px rgb(16 185 129 / 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-success:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Danger - Destructive actions */
+.btn-danger {
+    @apply bg-linear-to-b from-rose-500 to-rose-600
+           text-white px-5 py-2.5 rounded-xl font-semibold
+           hover:from-rose-600 hover:to-rose-700
+           active:from-rose-700 active:to-rose-800
+           focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2
+           transition-all duration-200
+           inline-flex items-center justify-center gap-2;
+    box-shadow:
+        0 1px 2px 0 rgb(0 0 0 / 0.05),
+        inset 0 1px 0 0 rgb(255 255 255 / 0.1);
+}
+
+.btn-danger:hover {
+    box-shadow:
+        0 4px 12px -2px rgb(244 63 94 / 0.4),
+        inset 0 1px 0 0 rgb(255 255 255 / 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-danger:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Ghost - Subtle actions */
+.btn-ghost {
+    @apply text-slate-600 px-4 py-2 rounded-xl font-medium
+           hover:bg-slate-100 hover:text-slate-900
+           active:bg-slate-200
+           focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2
+           transition-all duration-200
+           inline-flex items-center justify-center gap-2;
+}
+
+.btn-ghost:hover {
+    transform: translateY(-1px);
+}
+
+.btn-ghost:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Button sizes */
+.btn-sm {
+    @apply text-sm px-4 py-2;
+}
+
+.btn-xs {
+    @apply text-xs px-3 py-1.5;
+}
+
+.btn-lg {
+    @apply text-base px-6 py-3;
+}
+
+/* Icon-only button */
+.btn-icon {
+    @apply p-2.5 rounded-xl;
+}
+
+.btn-icon-sm {
+    @apply p-2 rounded-lg;
+}

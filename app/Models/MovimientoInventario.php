@@ -32,9 +32,9 @@ class MovimientoInventario extends Model
         return $this->belongsTo(Producto::class);
     }
 
-    public function notaRemision()
+    public function referencia()
     {
-        return $this->belongsTo(NotaRemision::class);
+        return $this->morphTo('referencia', 'referencia_tipo', 'referencia_id');
     }
 
     public function usuario()

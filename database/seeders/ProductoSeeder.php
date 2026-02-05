@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Categoria;
 use App\Models\Producto;
 
 /**
@@ -141,7 +142,18 @@ class ProductoSeeder extends Seeder
             ],
         ];
 
+        $categoriaMap = Categoria::pluck('id', 'nombre');
+
+        $prefixMap = [
+            'HERR' => $categoriaMap['Herramientas'] ?? null,
+            'MAT'  => $categoriaMap['Materiales de Construcción'] ?? null,
+            'ELEC' => $categoriaMap['Electricidad'] ?? null,
+            'PINT' => $categoriaMap['Pinturas'] ?? null,
+        ];
+
         foreach ($productos as $producto) {
+            $prefix = explode('-', $producto['codigo'])[0] ?? '';
+            $producto['categoria_id'] = $prefixMap[$prefix] ?? null;
             Producto::create($producto);
         }
     }

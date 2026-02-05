@@ -1,0 +1,166 @@
+/* ============================================
+   FORMS - Modern Refined Inputs
+   Clean, professional, accessible
+   ============================================ */
+
+.form-input {
+    @apply w-full px-4 py-3
+           bg-white
+           border border-slate-200
+           rounded-xl
+           text-slate-900
+           placeholder-slate-400
+           transition-all duration-200
+           focus:border-sky-400
+           focus:ring-4
+           focus:ring-sky-500/10
+           focus:outline-none;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+}
+
+.form-input:hover:not(:focus) {
+    @apply border-slate-300;
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 0.04);
+}
+
+.form-input:focus {
+    box-shadow:
+        0 0 0 4px rgb(14 165 233 / 0.1),
+        0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.form-select {
+    @apply w-full px-4 py-3
+           bg-white
+           border border-slate-200
+           rounded-xl
+           text-slate-900
+           transition-all duration-200
+           focus:border-sky-400
+           focus:ring-4
+           focus:ring-sky-500/10
+           focus:outline-none
+           cursor-pointer;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+    appearance: none;
+}
+
+.form-select:hover:not(:focus) {
+    @apply border-slate-300;
+}
+
+.form-textarea {
+    @apply w-full px-4 py-3
+           bg-white
+           border border-slate-200
+           rounded-xl
+           text-slate-900
+           placeholder-slate-400
+           transition-all duration-200
+           focus:border-sky-400
+           focus:ring-4
+           focus:ring-sky-500/10
+           focus:outline-none
+           resize-y;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+    min-height: 100px;
+}
+
+.form-input-number {
+    @apply w-full px-4 py-3
+           bg-white
+           border border-slate-200
+           rounded-xl
+           text-slate-900
+           text-right tabular-nums font-semibold
+           transition-all duration-200
+           focus:border-sky-400
+           focus:ring-4
+           focus:ring-sky-500/10
+           focus:outline-none;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+}
+
+.form-checkbox {
+    @apply w-5 h-5 rounded-md
+           border-slate-300
+           text-sky-600
+           focus:ring-sky-500/20 focus:ring-offset-0
+           transition-all duration-150
+           cursor-pointer;
+}
+
+.form-checkbox:checked {
+    @apply border-sky-600 bg-sky-600;
+}
+
+/* Form labels */
+.form-label {
+    @apply block text-sm font-semibold text-slate-700 mb-2;
+}
+
+.form-label-required::after {
+    content: ' *';
+    @apply text-rose-500;
+}
+
+/* Form structure */
+.form-group {
+    @apply mb-5;
+}
+
+.form-section {
+    @apply bg-white rounded-2xl p-6
+           border border-slate-200/60
+           transition-shadow duration-300;
+    box-shadow:
+        0 1px 3px 0 rgb(0 0 0 / 0.04),
+        0 0 0 1px rgb(148 163 184 / 0.05);
+}
+
+.form-section:hover {
+    box-shadow:
+        0 4px 6px -1px rgb(0 0 0 / 0.06),
+        0 0 0 1px rgb(148 163 184 / 0.1);
+}
+
+.form-section-title {
+    @apply text-lg font-bold text-slate-900 mb-5 pb-4
+           border-b border-slate-100
+           flex items-center gap-3;
+}
+
+.form-error {
+    @apply text-rose-600 text-sm mt-1.5 font-medium
+           flex items-center gap-1.5;
+}
+
+.form-error::before {
+    content: '';
+    @apply w-1 h-1 rounded-full bg-rose-500;
+}
+
+/* Input with icon */
+.form-input-wrapper {
+    @apply relative;
+}
+
+.form-input-icon {
+    @apply absolute left-4 top-1/2 -translate-y-1/2
+           w-5 h-5 text-slate-400
+           pointer-events-none;
+}
+
+.form-input-with-icon {
+    @apply pl-12;
+}
+
+/* Form hint text */
+.form-hint {
+    @apply text-xs text-slate-500 mt-1.5;
+}

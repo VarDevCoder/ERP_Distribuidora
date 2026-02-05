@@ -8,7 +8,10 @@
             <h1 class="text-3xl font-bold text-gray-800">{{ $orden->numero }}</h1>
             <p class="text-gray-600 mt-1">{{ $orden->estado_descripcion }}</p>
         </div>
-        <a href="{{ route('ordenes-envio.index') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Volver</a>
+        <div class="flex space-x-2">
+            <a href="{{ route('pdf.orden-envio', $orden) }}" class="btn-secondary" target="_blank">PDF</a>
+            <a href="{{ route('ordenes-envio.index') }}" class="btn-secondary">Volver</a>
+        </div>
     </div>
 
     <!-- Acciones según estado -->
@@ -156,10 +159,10 @@
                 </table>
             </div>
 
-            <!-- Pedido Cliente -->
+            <!-- Solicitud de Cliente -->
             @if($orden->pedidoCliente)
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Pedido de Cliente</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Solicitud de Cliente</h2>
                     <div class="border rounded-lg p-4">
                         <div class="flex justify-between items-center">
                             <div>

@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Proveedores</h1>
-            <p class="text-gray-600 mt-1">Gestiona los proveedores del sistema</p>
+            <h1 class="page-title">Proveedores</h1>
+            <p class="page-subtitle">Gestiona los proveedores del sistema</p>
         </div>
         <a href="{{ route('proveedores.create') }}" class="btn-primary">
             + Nuevo Proveedor

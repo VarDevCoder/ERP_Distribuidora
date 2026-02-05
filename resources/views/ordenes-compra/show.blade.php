@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <div class="max-w-5xl mx-auto">
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -10,10 +8,11 @@
             <p class="text-gray-600 mt-1">{{ $orden->estado_descripcion }}</p>
         </div>
         <div class="flex space-x-2">
+            <a href="{{ route('pdf.orden-compra', $orden) }}" class="btn-secondary" target="_blank">PDF</a>
             @if($orden->estado === 'BORRADOR')
-                <a href="{{ route('ordenes-compra.edit', $orden) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Editar</a>
+                <a href="{{ route('ordenes-compra.edit', $orden) }}" class="btn-primary">Editar</a>
             @endif
-            <a href="{{ route('ordenes-compra.index') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Volver</a>
+            <a href="{{ route('ordenes-compra.index') }}" class="btn-secondary">Volver</a>
         </div>
     </div>
 
@@ -52,26 +51,30 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="font-medium text-indigo-900">Orden confirmada</p>
-                    <p class="text-sm text-indigo-700">Marca cuando la mercadería esté en camino</p>
+                    <p class="text-sm text-indigo-700">Marca cuando la mercaderia este en camino o registra la recepcion directamente</p>
                 </div>
-                <form action="{{ route('ordenes-compra.en-transito', $orden) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium">
-                        Marcar En Tránsito
-                    </button>
-                </form>
+                <div class="flex gap-2">
+                    <form action="{{ route('ordenes-compra.en-transito', $orden) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn-secondary">Marcar En Transito</button>
+                    </form>
+                    <a href="{{ route('ordenes-compra.form-recepcion', $orden) }}" class="btn-primary">
+                        Registrar Recepcion
+                    </a>
+                </div>
             </div>
         </div>
-    @elseif(in_array($orden->estado, ['CONFIRMADA', 'EN_TRANSITO', 'RECIBIDA_PARCIAL']))
+    @elseif(in_array($orden->estado, ['EN_TRANSITO', 'RECIBIDA_PARCIAL']))
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="font-medium text-yellow-900">Mercadería en camino o pendiente</p>
-                    <p class="text-sm text-yellow-700">Registra la recepción de mercadería</p>
+                    <p class="font-medium text-yellow-900">
+                        {{ $orden->estado === 'EN_TRANSITO' ? 'Mercaderia en camino' : 'Recepcion parcial pendiente' }}
+                    </p>
+                    <p class="text-sm text-yellow-700">Registra la recepcion de mercaderia</p>
                 </div>
-                <a href="{{ route('ordenes-compra.form-recepcion', $orden) }}"
-                   class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
-                    Registrar Recepción
+                <a href="{{ route('ordenes-compra.form-recepcion', $orden) }}" class="btn-primary">
+                    Registrar Recepcion
                 </a>
             </div>
         </div>
@@ -167,7 +170,7 @@
 
             @if($orden->pedidoCliente)
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Pedido de Cliente Relacionado</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Solicitud de Cliente Relacionada</h2>
                     <div class="border rounded-lg p-4">
                         <div class="flex justify-between items-center">
                             <div>
@@ -215,9 +218,10 @@
                         <span>{{ number_format($orden->subtotal, 0, ',', '.') }} Gs.</span>
                     </div>
                     @if($orden->descuento > 0)
+                        @php $descMontoShow = (int) round($orden->subtotal * $orden->descuento / 100); @endphp
                         <div class="flex justify-between text-red-600">
-                            <span>Descuento:</span>
-                            <span>-{{ number_format($orden->descuento, 0, ',', '.') }} Gs.</span>
+                            <span>Descuento ({{ $orden->descuento }}%):</span>
+                            <span>-{{ number_format($descMontoShow, 0, ',', '.') }} Gs.</span>
                         </div>
                     @endif
                     <div class="flex justify-between text-lg font-bold border-t pt-2">
@@ -228,13 +232,16 @@
 
                 @if($orden->puedeSerCancelada())
                     <div class="mt-6 pt-6 border-t">
-                        {{-- 2. Modificamos el formulario: quitamos el onclick nativo y agregamos ID --}}
-                        <form action="{{ route('ordenes-compra.cancelar', $orden) }}" method="POST" id="formCancelarOrden">
+                        <form action="{{ route('ordenes-compra.cancelar', $orden) }}" method="POST"
+                              @submit.prevent="confirmSubmit($event, {
+                                  title: '¿Cancelar orden?',
+                                  text: 'Esta acción no se puede deshacer.',
+                                  confirmButtonText: 'Sí, cancelar orden'
+                              })">
                             @csrf
-                            <input type="text" name="motivo_cancelacion" id="motivoInput" placeholder="Motivo de cancelación..."
-                                   class="w-full mb-2 rounded-lg border-gray-300 text-sm" required>
-                            
-                            <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+                            <input type="text" name="motivo_cancelacion" placeholder="Motivo de cancelación..."
+                                   class="form-input mb-2 text-sm" required>
+                            <button type="submit" class="btn-danger w-full">
                                 Cancelar Orden
                             </button>
                         </form>
@@ -245,38 +252,4 @@
     </div>
 </div>
 
-{{-- 3. Script para manejar el SweetAlert --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('formCancelarOrden');
-        
-        if(form) {
-            form.addEventListener('submit', function(e) {
-                // Prevenimos el envío inmediato
-                e.preventDefault();
-
-                // Obtenemos el motivo que escribió el usuario
-                const motivo = document.getElementById('motivoInput').value;
-
-                // Lanzamos la alerta
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: `Vas a cancelar esta orden por el siguiente motivo: "${motivo}". Esta acción no se puede deshacer.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33', // Rojo
-                    cancelButtonColor: '#3085d6', // Azul
-                    confirmButtonText: 'Sí, cancelar orden',
-                    cancelButtonText: 'Volver atrás',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Si confirma, enviamos el formulario
-                        this.submit();
-                    }
-                });
-            });
-        }
-    });
-</script>
 @endsection

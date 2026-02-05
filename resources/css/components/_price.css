@@ -1,0 +1,19 @@
+/* ============================================
+   PRICE DISPLAY - Currency & Numbers
+   ============================================ */
+
+.price {
+    @apply font-bold tabular-nums tracking-tight;
+}
+
+.price-lg {
+    @apply text-2xl;
+}
+
+.price-highlight {
+    @apply text-emerald-600;
+}
+
+.price-muted {
+    @apply text-slate-500 font-medium;
+}

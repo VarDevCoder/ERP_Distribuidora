@@ -10,18 +10,15 @@ use App\Models\MovimientoInventario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrdenEnvioController extends Controller
 {
-    /**
-     * Listar todas las órdenes de envío
-     */
     public function index(Request $request)
     {
         $query = OrdenEnvio::with(['items.producto', 'pedidoCliente', 'usuario'])
             ->orderBy('created_at', 'desc');
 
-        // Filtros
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
@@ -39,9 +36,6 @@ class OrdenEnvioController extends Controller
         return view('ordenes-envio.index', compact('ordenes'));
     }
 
-    /**
-     * Formulario de creación (desde pedido de cliente)
-     */
     public function create(Request $request)
     {
         if (!$request->filled('pedido_cliente_id')) {
@@ -58,9 +52,6 @@ class OrdenEnvioController extends Controller
         return view('ordenes-envio.create', compact('pedidoCliente'));
     }
 
-    /**
-     * Guardar nueva orden de envío
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -104,7 +95,6 @@ class OrdenEnvioController extends Controller
                 ]);
             }
 
-            // Actualizar estado del pedido
             $pedidoCliente->update(['estado' => PedidoCliente::ESTADO_LISTO_ENVIO]);
 
             DB::commit();
@@ -114,46 +104,36 @@ class OrdenEnvioController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al crear la orden: ' . $e->getMessage());
+            Log::error('Error al crear orden de envío', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al crear la orden de envío. Intente nuevamente.');
         }
     }
 
-    /**
-     * Ver detalle de la orden
-     */
-    public function show(OrdenEnvio $ordenesEnvio)
+    public function show(OrdenEnvio $ordenEnvio)
     {
-        $orden = $ordenesEnvio->load(['items.producto', 'pedidoCliente', 'usuario']);
+        $orden = $ordenEnvio->load(['items.producto', 'pedidoCliente', 'usuario']);
         return view('ordenes-envio.show', compact('orden'));
     }
 
-    /**
-     * Eliminar orden
-     */
-    public function destroy(OrdenEnvio $ordenesEnvio)
+    public function destroy(OrdenEnvio $ordenEnvio)
     {
-        $orden = $ordenesEnvio;
-        if (!in_array($orden->estado, [OrdenEnvio::ESTADO_PREPARANDO, OrdenEnvio::ESTADO_CANCELADO])) {
+        if (!in_array($ordenEnvio->estado, [OrdenEnvio::ESTADO_PREPARANDO, OrdenEnvio::ESTADO_CANCELADO])) {
             return back()->with('error', 'Solo se pueden eliminar órdenes en preparación o canceladas');
         }
 
-        $numero = $orden->numero;
+        $numero = $ordenEnvio->numero;
 
-        // Restaurar estado del pedido
-        if ($orden->pedidoCliente) {
-            $orden->pedidoCliente->update(['estado' => PedidoCliente::ESTADO_MERCADERIA_RECIBIDA]);
+        if ($ordenEnvio->pedidoCliente) {
+            $ordenEnvio->pedidoCliente->update(['estado' => PedidoCliente::ESTADO_MERCADERIA_RECIBIDA]);
         }
 
-        $orden->delete();
+        $ordenEnvio->delete();
 
         return redirect()
             ->route('ordenes-envio.index')
             ->with('success', "Orden {$numero} eliminada exitosamente");
     }
 
-    /**
-     * Marcar como lista para despachar
-     */
     public function listaDespachar(OrdenEnvio $orden)
     {
         if ($orden->estado !== OrdenEnvio::ESTADO_PREPARANDO) {
@@ -167,9 +147,6 @@ class OrdenEnvioController extends Controller
             ->with('success', 'Orden marcada como lista para despachar');
     }
 
-    /**
-     * Despachar (enviar)
-     */
     public function despachar(Request $request, OrdenEnvio $orden)
     {
         if (!$orden->puedeSerDespachada()) {
@@ -182,7 +159,8 @@ class OrdenEnvioController extends Controller
 
         DB::beginTransaction();
         try {
-            // Generar SALIDA de inventario
+            $orden->load('items.producto');
+
             foreach ($orden->items as $item) {
                 $producto = $item->producto;
                 $stockAnterior = $producto->stock_actual;
@@ -200,11 +178,8 @@ class OrdenEnvioController extends Controller
                     'cantidad' => $item->cantidad,
                     'stock_anterior' => $stockAnterior,
                     'stock_nuevo' => $stockNuevo,
-                    
-                    // CORRECCIÓN: Agregamos las referencias obligatorias
                     'referencia_tipo' => OrdenEnvio::class,
                     'referencia_id' => $orden->id,
-                    
                     'usuario_id' => Auth::id(),
                     'observaciones' => "Despacho orden {$orden->numero}",
                 ]);
@@ -216,7 +191,6 @@ class OrdenEnvioController extends Controller
                 'numero_guia' => $request->numero_guia,
             ]);
 
-            // Actualizar estado del pedido
             if ($orden->pedidoCliente) {
                 $orden->pedidoCliente->update(['estado' => PedidoCliente::ESTADO_ENVIADO]);
             }
@@ -228,13 +202,14 @@ class OrdenEnvioController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', $e->getMessage());
+            Log::error('Error al despachar orden de envío', ['exception' => $e->getMessage()]);
+            if (str_contains($e->getMessage(), 'Stock insuficiente')) {
+                return back()->with('error', $e->getMessage());
+            }
+            return back()->with('error', 'Error al despachar la orden. Intente nuevamente.');
         }
     }
 
-    /**
-     * Marcar como entregada
-     */
     public function entregar(Request $request, OrdenEnvio $orden)
     {
         if (!$orden->puedeSerEntregada()) {
@@ -251,7 +226,6 @@ class OrdenEnvioController extends Controller
             'observaciones_entrega' => $request->observaciones_entrega,
         ]);
 
-        // Actualizar estado del pedido
         if ($orden->pedidoCliente) {
             $orden->pedidoCliente->update(['estado' => PedidoCliente::ESTADO_ENTREGADO]);
         }
@@ -261,9 +235,6 @@ class OrdenEnvioController extends Controller
             ->with('success', 'Orden marcada como entregada. Pedido completado.');
     }
 
-    /**
-     * Registrar devolución
-     */
     public function devolver(Request $request, OrdenEnvio $orden)
     {
         if ($orden->estado !== OrdenEnvio::ESTADO_EN_TRANSITO) {
@@ -276,7 +247,8 @@ class OrdenEnvioController extends Controller
 
         DB::beginTransaction();
         try {
-            // Revertir SALIDA de inventario (hacer ENTRADA)
+            $orden->load('items.producto');
+
             foreach ($orden->items as $item) {
                 $producto = $item->producto;
                 $stockAnterior = $producto->stock_actual;
@@ -290,11 +262,8 @@ class OrdenEnvioController extends Controller
                     'cantidad' => $item->cantidad,
                     'stock_anterior' => $stockAnterior,
                     'stock_nuevo' => $stockNuevo,
-                    
-                    // CORRECCIÓN PREVENTIVA: También agregamos referencia aquí
                     'referencia_tipo' => OrdenEnvio::class,
                     'referencia_id' => $orden->id,
-                    
                     'usuario_id' => Auth::id(),
                     'observaciones' => "Devolución orden {$orden->numero}: {$request->observaciones_entrega}",
                 ]);
@@ -312,13 +281,11 @@ class OrdenEnvioController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al registrar devolución: ' . $e->getMessage());
+            Log::error('Error al registrar devolución', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al registrar la devolución. Intente nuevamente.');
         }
     }
 
-    /**
-     * Cancelar orden
-     */
     public function cancelar(Request $request, OrdenEnvio $orden)
     {
         if (!$orden->puedeSerCancelada()) {
@@ -334,7 +301,6 @@ class OrdenEnvioController extends Controller
             'observaciones_entrega' => $request->observaciones_entrega,
         ]);
 
-        // Restaurar estado del pedido
         if ($orden->pedidoCliente) {
             $orden->pedidoCliente->update(['estado' => PedidoCliente::ESTADO_MERCADERIA_RECIBIDA]);
         }

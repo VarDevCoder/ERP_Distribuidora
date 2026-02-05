@@ -1,0 +1,71 @@
+/* ============================================
+   NAVBAR - Modern Glassmorphism Navigation
+   ============================================ */
+
+.nav-bar {
+    @apply bg-slate-900/95 backdrop-blur-xl shadow-xl;
+    background-image: linear-gradient(to right, rgb(15 23 42 / 0.98), rgb(30 41 59 / 0.95));
+    border-bottom: 1px solid rgb(51 65 85 / 0.5);
+}
+
+.nav-link {
+    @apply text-slate-400 hover:text-white
+           px-3 py-2 rounded-lg text-sm font-medium
+           transition-all duration-200
+           hover:bg-white/10
+           relative;
+}
+
+.nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5
+           bg-sky-400 rounded-full
+           transition-all duration-300;
+}
+
+.nav-link:hover::after {
+    @apply w-4;
+}
+
+.nav-link-active {
+    @apply text-white bg-white/10;
+}
+
+.nav-link-active::after {
+    @apply w-4 bg-sky-400;
+}
+
+/* Logo hover effect - use regular CSS for group behavior */
+.nav-logo {
+    @apply flex items-center gap-2.5;
+}
+
+.nav-logo-icon {
+    @apply text-2xl transition-transform duration-300;
+}
+
+.nav-logo:hover .nav-logo-icon {
+    transform: scale(1.1);
+}
+
+.nav-logo-text {
+    @apply text-lg font-bold text-white tracking-tight;
+}
+
+/* User avatar */
+.nav-avatar {
+    @apply w-8 h-8 rounded-full
+           border-2 border-sky-400/50
+           flex items-center justify-center
+           text-white font-bold text-xs
+           shadow-lg shadow-sky-500/25
+           transition-transform duration-200
+           hover:scale-105;
+    background: linear-gradient(to bottom right, rgb(14 165 233), rgb(124 58 237));
+}
+
+/* Mobile menu */
+.nav-mobile-menu {
+    @apply lg:hidden border-t border-slate-700/50
+           bg-slate-900/98 backdrop-blur-xl;
+}

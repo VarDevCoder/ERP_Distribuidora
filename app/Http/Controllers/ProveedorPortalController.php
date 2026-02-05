@@ -7,6 +7,7 @@ use App\Models\SolicitudPresupuestoItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Portal para usuarios con rol PROVEEDOR
@@ -183,7 +184,8 @@ class ProveedorPortalController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al enviar cotización: ' . $e->getMessage());
+            Log::error('Error al enviar cotización', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al enviar la cotización. Intente nuevamente.');
         }
     }
 

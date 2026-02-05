@@ -1,0 +1,15 @@
+/* ============================================
+   PAGE HEADERS & STRUCTURE
+   ============================================ */
+
+.page-header {
+    @apply flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8;
+}
+
+.page-title {
+    @apply text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight;
+}
+
+.page-subtitle {
+    @apply text-slate-500 text-sm mt-1;
+}

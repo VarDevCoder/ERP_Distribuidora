@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Pedidos de Clientes</h1>
-            <p class="text-gray-600 mt-1">Flujo ANKOR - Gestiona los pedidos de tus clientes</p>
+            <h1 class="page-title">Solicitudes de Clientes</h1>
+            <p class="page-subtitle">Gestiona las solicitudes de tus clientes</p>
         </div>
         <a href="{{ route('pedidos-cliente.create') }}" class="btn-primary">
-            + Nuevo Pedido
+            + Nueva Solicitud
         </a>
     </div>
 
@@ -81,8 +81,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-8 text-gray-500">
-                            No hay pedidos registrados
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <p class="empty-state-text">No hay solicitudes registradas</p>
+                                <a href="{{ route('pedidos-cliente.create') }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm mt-2 inline-block">Crear primera solicitud</a>
+                            </div>
                         </td>
                     </tr>
                 @endforelse

@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Solicitudes de Cotizacion</h1>
-            <p class="text-gray-600 mt-1">Cotizaciones enviadas a proveedores</p>
+            <h1 class="page-title">Solicitudes de Cotizacion</h1>
+            <p class="page-subtitle">Cotizaciones enviadas a proveedores</p>
         </div>
         <a href="{{ route('solicitudes-presupuesto.create') }}" class="btn-primary">
             + Nueva Solicitud
@@ -45,7 +45,7 @@
                 <tr>
                     <th>Numero</th>
                     <th>Proveedor</th>
-                    <th>Pedido Cliente</th>
+                    <th>Solicitud</th>
                     <th>Fecha</th>
                     <th>Estado</th>
                     <th class="text-right">Total Cotizado</th>

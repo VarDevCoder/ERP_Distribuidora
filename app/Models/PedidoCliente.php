@@ -16,6 +16,7 @@ class PedidoCliente extends Model
 
     protected $fillable = [
         'numero',
+        'cliente_id',
         'cliente_nombre',
         'cliente_ruc',
         'cliente_telefono',
@@ -89,13 +90,12 @@ class PedidoCliente extends Model
     }
 
     /**
-     * Generar número de pedido automáticamente
+     * Generar número de solicitud automáticamente
      */
     public static function generarNumero(): string
     {
-        $año = date('Y');
-        $ultimo = static::whereYear('created_at', $año)->count() + 1;
-        return sprintf('PED-%s-%04d', $año, $ultimo);
+        $ultimo = static::max('id') ?? 0;
+        return sprintf('Solicitud #%d', $ultimo + 1);
     }
 
     /**
@@ -118,11 +118,17 @@ class PedidoCliente extends Model
     public function calcularTotales(): void
     {
         $this->subtotal = (int) $this->items->sum('subtotal');
-        $this->total = $this->subtotal - $this->descuento;
+        $descuentoMonto = (int) round($this->subtotal * $this->descuento / 100);
+        $this->total = max(0, $this->subtotal - $descuentoMonto);
         $this->save();
     }
 
     // Relaciones
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class);
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(PedidoClienteItem::class);
@@ -141,6 +147,11 @@ class PedidoCliente extends Model
     public function ordenEnvio(): HasOne
     {
         return $this->hasOne(OrdenEnvio::class);
+    }
+
+    public function solicitudesPresupuesto(): HasMany
+    {
+        return $this->hasMany(SolicitudPresupuesto::class);
     }
 
     // Helpers de estado
@@ -192,7 +203,7 @@ class PedidoCliente extends Model
     public function getEstadoDescripcionAttribute(): string
     {
         return match($this->estado) {
-            self::ESTADO_RECIBIDO => 'Pedido recibido del cliente',
+            self::ESTADO_RECIBIDO => 'Solicitud recibida del cliente',
             self::ESTADO_EN_PROCESO => 'Procesando - solicitando presupuestos',
             self::ESTADO_PRESUPUESTADO => 'Presupuestos de proveedores recibidos',
             self::ESTADO_ORDEN_COMPRA => 'Orden de compra emitida',
@@ -200,7 +211,7 @@ class PedidoCliente extends Model
             self::ESTADO_LISTO_ENVIO => 'Listo para enviar al cliente',
             self::ESTADO_ENVIADO => 'Enviado al cliente',
             self::ESTADO_ENTREGADO => 'Entregado al cliente',
-            self::ESTADO_CANCELADO => 'Pedido cancelado',
+            self::ESTADO_CANCELADO => 'Solicitud cancelada',
             default => 'Estado desconocido',
         };
     }

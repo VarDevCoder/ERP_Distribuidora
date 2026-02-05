@@ -1,0 +1,205 @@
+/* ============================================
+   UTILITY CLASSES
+   Modern helpers for consistent UI
+   ============================================ */
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Action rows - responsive button groups */
+.actions-row {
+    @apply flex flex-col sm:flex-row gap-2;
+}
+
+/* Responsive grids */
+.grid-responsive-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+}
+
+.grid-responsive-3 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.grid-responsive-4 {
+    @apply grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+}
+
+/* Text utilities */
+.text-balance {
+    text-wrap: balance;
+}
+
+/* Transition utilities */
+.transition-smooth {
+    @apply transition-all duration-300 ease-out;
+}
+
+/* ============================================
+   ANIMATIONS & MICRO-INTERACTIONS
+   ============================================ */
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Staggered fade in for lists */
+.stagger-fade-in > * {
+    opacity: 0;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.stagger-fade-in > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-fade-in > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-fade-in > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-fade-in > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-fade-in > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-fade-in > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* Slide up animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+}
+
+/* Subtle pulse for attention */
+@keyframes subtlePulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-subtle-pulse {
+    animation: subtlePulse 2s ease-in-out infinite;
+}
+
+/* Hover lift effect */
+.hover-lift {
+    @apply transition-all duration-200;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Hover glow effect */
+.hover-glow {
+    @apply transition-all duration-300;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 20px -5px rgb(14 165 233 / 0.3);
+}
+
+/* Scale on click */
+.active-scale:active {
+    transform: scale(0.98);
+}
+
+/* ============================================
+   BACKDROP & OVERLAYS
+   ============================================ */
+
+.backdrop-blur-soft {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.backdrop-blur-strong {
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+/* Gradient overlays */
+.gradient-fade-b {
+    background: linear-gradient(to bottom, transparent, rgb(248 250 252));
+}
+
+.gradient-fade-t {
+    background: linear-gradient(to top, transparent, rgb(248 250 252));
+}
+
+/* ============================================
+   FOCUS STATES
+   ============================================ */
+
+.focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2;
+}
+
+.focus-ring-inset {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-inset;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    @apply bg-slate-200 rounded;
+    background: linear-gradient(
+        90deg,
+        rgb(226 232 240) 25%,
+        rgb(241 245 249) 50%,
+        rgb(226 232 240) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ============================================
+   DIVIDERS
+   ============================================ */
+
+.divider {
+    @apply border-t border-slate-200 my-4;
+}
+
+.divider-subtle {
+    @apply border-t border-slate-100 my-3;
+}
+
+.divider-vertical {
+    @apply w-px h-6 bg-slate-200 mx-2;
+}

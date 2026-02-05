@@ -1,0 +1,85 @@
+/* ============================================
+   TABLES - Clean Data Display
+   ============================================ */
+
+.table-container {
+    @apply overflow-x-auto rounded-2xl border border-slate-200 shadow-sm bg-white;
+    -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+    @apply min-w-full;
+}
+
+.data-table thead {
+    @apply bg-slate-50 border-b border-slate-200;
+}
+
+.data-table th {
+    @apply px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider;
+}
+
+.data-table tbody {
+    @apply divide-y divide-slate-100;
+}
+
+.data-table tbody tr {
+    @apply hover:bg-slate-50/50 transition-colors duration-150;
+}
+
+.data-table td {
+    @apply px-5 py-4 text-sm text-slate-700;
+}
+
+/* ============================================
+   COMPARISON TABLE - Price Comparisons
+   ============================================ */
+
+.comparison-table {
+    @apply w-full;
+}
+
+.comparison-table thead {
+    @apply bg-slate-800;
+}
+
+.comparison-table th {
+    @apply px-4 py-4 text-xs font-semibold text-slate-300 uppercase tracking-wider text-center;
+}
+
+.comparison-table th:first-child {
+    @apply text-left;
+}
+
+.comparison-table tbody {
+    @apply bg-white divide-y divide-slate-100;
+}
+
+.comparison-table tbody tr {
+    @apply hover:bg-slate-50 transition-colors duration-150;
+}
+
+.comparison-table td {
+    @apply px-4 py-4 text-sm;
+}
+
+.comparison-table tfoot {
+    @apply bg-slate-50 border-t-2 border-slate-200;
+}
+
+.comparison-table tfoot td {
+    @apply px-4 py-4 font-semibold;
+}
+
+/* Price cells */
+.price-cell {
+    @apply text-center tabular-nums;
+}
+
+.price-cell-best {
+    @apply bg-emerald-50 font-bold text-emerald-700;
+}
+
+.price-cell-value {
+    @apply text-lg font-bold text-slate-800;
+}

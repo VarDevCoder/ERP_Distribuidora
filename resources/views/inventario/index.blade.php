@@ -3,61 +3,61 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Inventario</h1>
-            <p class="text-gray-600 mt-1">Estado actual de stocks y productos</p>
+            <h1 class="page-title">Inventario</h1>
+            <p class="page-subtitle">Estado actual de stocks y productos</p>
         </div>
         <a href="{{ route('inventario.movimientos') }}" class="btn-primary">
-            Ver Todos los Movimientos
+            Ver Movimientos
         </a>
     </div>
 
     <!-- Resumen de Estadisticas -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg shadow-lg p-6 border-2 border-blue-400">
+    <div class="grid-responsive-4 mb-6">
+        <div class="stat-card border-l-4 border-l-blue-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-bold text-blue-700">Total Productos</p>
-                    <p class="text-3xl font-bold text-blue-900 mt-2">{{ $productos->total() }}</p>
+                    <p class="stat-card-label">Total Productos</p>
+                    <p class="stat-card-value text-blue-700">{{ $productos->total() }}</p>
                 </div>
-                <div class="text-4xl">📦</div>
+                <div class="stat-card-icon">📦</div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-red-100 to-red-50 rounded-lg shadow-lg p-6 border-2 border-red-400">
+        <div class="stat-card border-l-4 border-l-red-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-bold text-red-700">Stock Bajo</p>
-                    <p class="text-3xl font-bold text-red-700 mt-2">
+                    <p class="stat-card-label">Stock Bajo</p>
+                    <p class="stat-card-value text-red-600">
                         {{ $productos->filter(fn($p) => $p->stock_actual <= $p->stock_minimo)->count() }}
                     </p>
                 </div>
-                <div class="text-4xl">⚠️</div>
+                <div class="stat-card-icon">⚠️</div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg shadow-lg p-6 border-2 border-purple-400">
+        <div class="stat-card border-l-4 border-l-purple-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-bold text-purple-700">Movimientos (Todos)</p>
-                    <p class="text-3xl font-bold text-purple-900 mt-2">
+                    <p class="stat-card-label">Movimientos</p>
+                    <p class="stat-card-value text-purple-700">
                         {{ $productos->sum('movimientos_count') }}
                     </p>
                 </div>
-                <div class="text-4xl">📊</div>
+                <div class="stat-card-icon">📊</div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-green-100 to-green-50 rounded-lg shadow-lg p-6 border-2 border-green-400">
+        <div class="stat-card border-l-4 border-l-emerald-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-bold text-green-700">Activos</p>
-                    <p class="text-3xl font-bold text-green-700 mt-2">
+                    <p class="stat-card-label">Activos</p>
+                    <p class="stat-card-value text-emerald-600">
                         {{ $productos->filter(fn($p) => $p->activo)->count() }}
                     </p>
                 </div>
-                <div class="text-4xl">✓</div>
+                <div class="stat-card-icon">✓</div>
             </div>
         </div>
     </div>

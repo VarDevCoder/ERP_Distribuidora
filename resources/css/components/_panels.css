@@ -1,0 +1,39 @@
+/* ============================================
+   ACTION PANELS - Contextual Action Areas
+   ============================================ */
+
+.action-panel {
+    @apply bg-slate-50 rounded-2xl p-5 border border-slate-100;
+}
+
+.action-panel-primary {
+    @apply bg-sky-50 border-sky-100;
+}
+
+.action-panel-success {
+    @apply bg-emerald-50 border-emerald-100;
+}
+
+.action-panel-warning {
+    @apply bg-amber-50 border-amber-100;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.empty-state {
+    @apply text-center py-16;
+}
+
+.empty-state-icon {
+    @apply w-16 h-16 mx-auto mb-4 text-slate-300;
+}
+
+.empty-state-text {
+    @apply text-lg font-medium text-slate-500;
+}
+
+.empty-state-subtext {
+    @apply text-sm text-slate-400 mt-1;
+}

@@ -1,0 +1,119 @@
+/* ============================================
+   CARDS - Modern Glass & Depth
+   ============================================ */
+
+.card {
+    @apply bg-white rounded-2xl
+           border border-slate-200/60
+           transition-all duration-300;
+    box-shadow:
+        0 1px 3px 0 rgb(0 0 0 / 0.04),
+        0 1px 2px -1px rgb(0 0 0 / 0.04),
+        0 0 0 1px rgb(148 163 184 / 0.05);
+}
+
+.card:hover {
+    @apply border-slate-200;
+    box-shadow:
+        0 4px 6px -1px rgb(0 0 0 / 0.06),
+        0 2px 4px -2px rgb(0 0 0 / 0.04),
+        0 0 0 1px rgb(148 163 184 / 0.1);
+    transform: translateY(-1px);
+}
+
+.card-header {
+    @apply px-6 py-5 border-b border-slate-100/80;
+}
+
+.card-body {
+    @apply p-6;
+}
+
+/* ============================================
+   STAT CARDS - Dashboard Metrics
+   ============================================ */
+
+.stat-card {
+    @apply bg-white rounded-2xl p-6
+           border border-slate-200/60
+           transition-all duration-300;
+    box-shadow:
+        0 1px 3px 0 rgb(0 0 0 / 0.04),
+        0 0 0 1px rgb(148 163 184 / 0.05);
+}
+
+.stat-card:hover {
+    @apply border-slate-200;
+    box-shadow:
+        0 8px 16px -4px rgb(0 0 0 / 0.08),
+        0 0 0 1px rgb(148 163 184 / 0.1);
+    transform: translateY(-2px);
+}
+
+.stat-card-value {
+    @apply text-3xl font-bold text-slate-900 tabular-nums tracking-tight;
+}
+
+.stat-card-label {
+    @apply text-sm text-slate-500 mt-1.5 font-medium;
+}
+
+/* Stat card with accent border */
+.stat-card-accent {
+    @apply relative overflow-hidden;
+}
+
+.stat-card-accent::before {
+    content: '';
+    @apply absolute top-0 left-0 w-1 h-full rounded-l-2xl;
+}
+
+.stat-card-accent-sky::before {
+    @apply bg-linear-to-b from-sky-400 to-sky-600;
+}
+
+.stat-card-accent-emerald::before {
+    @apply bg-linear-to-b from-emerald-400 to-emerald-600;
+}
+
+.stat-card-accent-violet::before {
+    @apply bg-linear-to-b from-violet-400 to-violet-600;
+}
+
+.stat-card-accent-amber::before {
+    @apply bg-linear-to-b from-amber-400 to-amber-600;
+}
+
+/* ============================================
+   GLASS CARD - Frosted effect
+   ============================================ */
+
+.card-glass {
+    @apply rounded-2xl p-6
+           bg-white/70 backdrop-blur-xl
+           border border-white/20
+           shadow-xl shadow-slate-900/5;
+}
+
+/* ============================================
+   INTERACTIVE CARD - Clickable items
+   ============================================ */
+
+.card-interactive {
+    @apply bg-white rounded-xl p-5
+           border border-slate-200/60
+           transition-all duration-200
+           cursor-pointer;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+}
+
+.card-interactive:hover {
+    @apply border-sky-200 bg-sky-50/30;
+    box-shadow:
+        0 4px 12px -2px rgb(14 165 233 / 0.12),
+        0 0 0 1px rgb(14 165 233 / 0.1);
+}
+
+.card-interactive:active {
+    transform: scale(0.99);
+}

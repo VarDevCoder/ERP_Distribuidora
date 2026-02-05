@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Ordenes de Envio</h1>
-            <p class="text-gray-600 mt-1">Flujo ANKOR - Gestiona los envios a clientes</p>
+            <h1 class="page-title">Ordenes de Envio</h1>
+            <p class="page-subtitle">Gestiona los envios a clientes</p>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
             <thead>
                 <tr>
                     <th>Numero</th>
-                    <th>Pedido</th>
+                    <th>Solicitud</th>
                     <th>Direccion</th>
                     <th>Generacion</th>
                     <th>Estado</th>

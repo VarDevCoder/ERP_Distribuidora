@@ -1,6 +1,7 @@
 # 🔄 Guía de Cambio de Ambientes - ERP Distribuidora
 
 ## 📋 Tabla de Contenidos
+
 - [Descripción General](#descripción-general)
 - [Ambientes Disponibles](#ambientes-disponibles)
 - [Cómo Cambiar de Ambiente](#cómo-cambiar-de-ambiente)
@@ -15,6 +16,7 @@
 Este proyecto cuenta con un sistema flexible para cambiar entre diferentes ambientes de base de datos según tus necesidades de desarrollo o producción.
 
 **¿Por qué es útil?**
+
 - Desarrolla localmente sin depender de conexión a internet
 - Cambia rápidamente entre desarrollo y producción
 - Mantén configuraciones separadas y organizadas
@@ -25,6 +27,7 @@ Este proyecto cuenta con un sistema flexible para cambiar entre diferentes ambie
 ## 🌍 Ambientes Disponibles
 
 ### 1. **Local** (SQLite)
+
 ```
 Base de datos: SQLite
 Archivo: database/database.sqlite
@@ -37,6 +40,7 @@ Uso ideal: Desarrollo local, pruebas rápidas
 ```
 
 ### 2. **Supabase** (PostgreSQL)
+
 ```
 Base de datos: PostgreSQL en la nube
 Host: db.pizwuwasqflpshwmlczy.supabase.co
@@ -58,11 +62,13 @@ Uso ideal: Producción, colaboración en equipo
 #### Opción 1: Usar el Script (Recomendado)
 
 **Cambiar a ambiente LOCAL (SQLite):**
+
 ```bash
 switch-env.bat local
 ```
 
 **Cambiar a ambiente SUPABASE (PostgreSQL):**
+
 ```bash
 switch-env.bat supabase
 ```
@@ -70,16 +76,19 @@ switch-env.bat supabase
 #### Opción 2: Manual
 
 **Para Local:**
+
 ```bash
 copy /Y .env.local .env
 ```
 
 **Para Supabase:**
+
 ```bash
 copy /Y .env.supabase .env
 ```
 
 ### ⚠️ IMPORTANTE
+
 Después de cambiar de ambiente, **DEBES reiniciar el servidor Laravel**:
 
 1. Detén el servidor: `Ctrl+C`
@@ -89,15 +98,16 @@ Después de cambiar de ambiente, **DEBES reiniciar el servidor Laravel**:
 
 ## 📁 Archivos de Configuración
 
-| Archivo | Descripción | ¿Editar? |
-|---------|-------------|----------|
-| `.env` | **Archivo activo** - Es el que usa Laravel | ❌ NO editar directamente |
-| `.env.local` | Configuración para SQLite local | ✅ SÍ, si necesitas cambiar config local |
-| `.env.supabase` | Configuración para Supabase PostgreSQL | ✅ SÍ, si cambia la contraseña de Supabase |
-| `switch-env.bat` | Script para cambiar ambientes | ⚙️ Solo si sabes lo que haces |
-| `database/database.sqlite` | Archivo de base de datos SQLite | 🗄️ Generado automáticamente |
+| Archivo                    | Descripción                                | ¿Editar?                                   |
+| -------------------------- | ------------------------------------------ | ------------------------------------------ |
+| `.env`                     | **Archivo activo** - Es el que usa Laravel | ❌ NO editar directamente                  |
+| `.env.local`               | Configuración para SQLite local            | ✅ SÍ, si necesitas cambiar config local   |
+| `.env.supabase`            | Configuración para Supabase PostgreSQL     | ✅ SÍ, si cambia la contraseña de Supabase |
+| `switch-env.bat`           | Script para cambiar ambientes              | ⚙️ Solo si sabes lo que haces              |
+| `database/database.sqlite` | Archivo de base de datos SQLite            | 🗄️ Generado automáticamente                |
 
 ### ⚡ Regla de Oro
+
 **NUNCA edites el archivo `.env` directamente.**
 Siempre edita `.env.local` o `.env.supabase` y luego ejecuta el script de cambio.
 
@@ -157,9 +167,11 @@ switch-env.bat supabase
 ## 🐛 Solución de Problemas
 
 ### Error: "could not translate host name"
+
 **Causa:** El servidor de Supabase no está disponible (mantenimiento, internet, etc.)
 
 **Solución:**
+
 ```bash
 # Cambiar temporalmente a local
 switch-env.bat local
@@ -167,17 +179,21 @@ php artisan serve
 ```
 
 ### Error: "database table not found"
+
 **Causa:** Las migraciones no se han ejecutado en el ambiente actual
 
 **Solución:**
+
 ```bash
 php artisan migrate
 ```
 
 ### Error: "SQLSTATE[HY000] [14] unable to open database file"
+
 **Causa:** El archivo SQLite no existe
 
 **Solución:**
+
 ```bash
 # Crear el archivo
 touch database/database.sqlite
@@ -190,15 +206,19 @@ php artisan migrate
 ```
 
 ### El cambio de ambiente no se refleja
+
 **Causa:** El servidor no se reinició después del cambio
 
 **Solución:**
+
 1. Detén el servidor: `Ctrl+C`
 2. Verifica que el `.env` cambió: `type .env` (Windows) o `cat .env` (Linux/Mac)
 3. Reinicia: `php artisan serve`
 
 ### "¿Cómo sé en qué ambiente estoy?"
+
 **Solución:**
+
 ```bash
 # Ver la configuración actual
 php artisan config:show database
@@ -211,14 +231,14 @@ type .env | findstr DB_CONNECTION
 
 ## 📊 Comparación Rápida
 
-| Característica | Local (SQLite) | Supabase (PostgreSQL) |
-|----------------|----------------|----------------------|
-| Velocidad | ⚡⚡⚡ Muy rápida | ⚡⚡ Rápida (depende de internet) |
-| Internet requerido | ❌ No | ✅ Sí |
-| Compartir datos | ❌ No | ✅ Sí |
-| Backup automático | ❌ No | ✅ Sí |
-| Funciones avanzadas | ⚠️ Limitadas | ✅ Completas |
-| Ideal para | Desarrollo | Producción |
+| Característica      | Local (SQLite)    | Supabase (PostgreSQL)             |
+| ------------------- | ----------------- | --------------------------------- |
+| Velocidad           | ⚡⚡⚡ Muy rápida | ⚡⚡ Rápida (depende de internet) |
+| Internet requerido  | ❌ No             | ✅ Sí                             |
+| Compartir datos     | ❌ No             | ✅ Sí                             |
+| Backup automático   | ❌ No             | ✅ Sí                             |
+| Funciones avanzadas | ⚠️ Limitadas      | ✅ Completas                      |
+| Ideal para          | Desarrollo        | Producción                        |
 
 ---
 
@@ -244,6 +264,7 @@ type .env | findstr DB_CONNECTION
 ## 📞 Soporte
 
 Si tienes problemas o preguntas:
+
 1. Revisa la sección [Solución de Problemas](#solución-de-problemas)
 2. Verifica los logs de Laravel: `storage/logs/laravel.log`
 3. Contacta al equipo de desarrollo

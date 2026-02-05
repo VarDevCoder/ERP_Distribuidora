@@ -1,0 +1,21 @@
+/* ============================================
+   TOOLTIPS - Helpful Hints
+   ============================================ */
+
+[data-tooltip] {
+    @apply relative cursor-help;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    @apply absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+           px-2 py-1 text-xs font-medium
+           bg-slate-900 text-white rounded-lg
+           opacity-0 invisible
+           transition-all duration-200
+           whitespace-nowrap z-50;
+}
+
+[data-tooltip]:hover::after {
+    @apply opacity-100 visible;
+}

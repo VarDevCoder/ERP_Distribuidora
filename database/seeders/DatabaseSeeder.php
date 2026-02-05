@@ -28,11 +28,15 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->command->info('Usuarios creados');
 
-        // 2. Productos de prueba
+        // 2. Categorías de productos
+        $this->call(CategoriaSeeder::class);
+        $this->command->info('Categorías creadas');
+
+        // 3. Productos de prueba (con categorías asignadas)
         $this->call(ProductoSeeder::class);
         $this->command->info('Productos creados');
 
-        // 3. Flujo completo ANKOR (pedidos en todos los estados)
+        // 4. Flujo completo ANKOR (pedidos en todos los estados)
         $this->call(FlujoAnkorSeeder::class);
         $this->command->info('Flujo ANKOR completo creado');
 

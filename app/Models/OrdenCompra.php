@@ -98,7 +98,8 @@ class OrdenCompra extends Model
     public function calcularTotales(): void
     {
         $this->subtotal = (int) $this->items->sum('subtotal');
-        $this->total = $this->subtotal - $this->descuento;
+        $descuentoMonto = (int) round($this->subtotal * $this->descuento / 100);
+        $this->total = max(0, $this->subtotal - $descuentoMonto);
         $this->save();
     }
 
@@ -124,11 +125,6 @@ class OrdenCompra extends Model
     public function pedidoCliente(): BelongsTo
     {
         return $this->belongsTo(PedidoCliente::class);
-    }
-
-    public function presupuestoProveedor(): BelongsTo
-    {
-        return $this->belongsTo(Presupuesto::class, 'presupuesto_proveedor_id');
     }
 
     public function usuario(): BelongsTo

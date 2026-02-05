@@ -7,7 +7,7 @@
             <h1 class="text-3xl font-bold text-gray-800">Recepción de Mercadería</h1>
             <p class="text-gray-600 mt-1">{{ $orden->numero }} - {{ $orden->proveedor_nombre }}</p>
         </div>
-        <a href="{{ route('ordenes-compra.show', $orden) }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Volver</a>
+        <a href="{{ route('ordenes-compra.show', $orden) }}" class="btn-secondary">Volver</a>
     </div>
 
     <form action="{{ route('ordenes-compra.recibir', $orden) }}" method="POST">
@@ -80,10 +80,8 @@
         </div>
 
         <div class="flex justify-end space-x-4">
-            <a href="{{ route('ordenes-compra.show', $orden) }}" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300">Cancelar</a>
-            <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium">
-                Registrar Recepción
-            </button>
+            <a href="{{ route('ordenes-compra.show', $orden) }}" class="btn-secondary">Cancelar</a>
+            <button type="submit" class="btn-primary">Registrar Recepcion</button>
         </div>
     </form>
 </div>

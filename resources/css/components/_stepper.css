@@ -1,0 +1,59 @@
+/* ============================================
+   WORKFLOW STEPPER - Modern Progress Indicator
+   ============================================ */
+
+.stepper {
+    @apply flex items-center gap-1;
+}
+
+.stepper-step {
+    @apply flex items-center;
+}
+
+/* Step indicators */
+.stepper-indicator {
+    @apply w-8 h-8 rounded-full flex items-center justify-center
+           text-sm font-bold transition-all duration-300;
+}
+
+.stepper-indicator-done {
+    @apply bg-emerald-500 text-white;
+}
+
+.stepper-indicator-current {
+    @apply bg-sky-500 text-white ring-4 ring-sky-100;
+}
+
+.stepper-indicator-pending {
+    @apply bg-slate-100 text-slate-400;
+}
+
+/* Step labels */
+.stepper-label {
+    @apply text-xs font-medium mt-2 text-center max-w-[70px];
+}
+
+.stepper-label-done {
+    @apply text-emerald-600;
+}
+
+.stepper-label-current {
+    @apply text-sky-600;
+}
+
+.stepper-label-pending {
+    @apply text-slate-400;
+}
+
+/* Connection lines */
+.stepper-line {
+    @apply w-6 h-0.5 mx-1;
+}
+
+.stepper-line-done {
+    @apply bg-emerald-400;
+}
+
+.stepper-line-pending {
+    @apply bg-slate-200;
+}

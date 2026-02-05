@@ -127,6 +127,16 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'seq' => [
+            'driver' => 'monolog',
+            'handler' => \App\Logging\SeqHandler::class,
+            'handler_with' => [
+                'serverUrl' => env('SEQ_URL', 'http://localhost:5341'),
+                'apiKey' => env('SEQ_API_KEY', null),
+                'level' => env('LOG_LEVEL', 'debug'),
+            ],
+        ],
+
     ],
 
 ];

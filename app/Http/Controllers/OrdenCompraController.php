@@ -10,18 +10,15 @@ use App\Models\MovimientoInventario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrdenCompraController extends Controller
 {
-    /**
-     * Listar todas las órdenes de compra
-     */
     public function index(Request $request)
     {
         $query = OrdenCompra::with(['items.producto', 'pedidoCliente', 'usuario'])
             ->orderBy('created_at', 'desc');
 
-        // Filtros
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
@@ -40,15 +37,11 @@ class OrdenCompraController extends Controller
         return view('ordenes-compra.index', compact('ordenes'));
     }
 
-    /**
-     * Formulario de creación
-     */
     public function create(Request $request)
     {
-        $productos = Producto::orderBy('nombre')->get();
+        $productos = Producto::active()->with('categoria')->orderBy('nombre')->get()->groupBy(fn($p) => $p->categoria?->nombre ?? 'Sin Categoría');
         $pedidoCliente = null;
 
-        // Si viene desde un pedido de cliente
         if ($request->filled('pedido_cliente_id')) {
             $pedidoCliente = PedidoCliente::with('items.producto')->find($request->pedido_cliente_id);
         }
@@ -56,9 +49,6 @@ class OrdenCompraController extends Controller
         return view('ordenes-compra.create', compact('productos', 'pedidoCliente'));
     }
 
-    /**
-     * Guardar nueva orden de compra
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -102,7 +92,9 @@ class OrdenCompraController extends Controller
                 ]);
             }
 
-            // Si viene de un pedido de cliente, actualizar su estado
+            $orden->load('items');
+            $orden->calcularTotales();
+
             if ($request->pedido_cliente_id) {
                 $pedido = PedidoCliente::find($request->pedido_cliente_id);
                 if ($pedido && $pedido->puedeGenerarOrdenCompra()) {
@@ -117,40 +109,32 @@ class OrdenCompraController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al crear la orden: ' . $e->getMessage());
+            Log::error('Error al crear orden de compra', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al crear la orden. Intente nuevamente.');
         }
     }
 
-    /**
-     * Ver detalle de la orden
-     */
-    public function show(OrdenCompra $ordenesCompra)
+    public function show(OrdenCompra $ordenCompra)
     {
-        $orden = $ordenesCompra->load(['items.producto', 'pedidoCliente', 'usuario']);
+        $orden = $ordenCompra->load(['items.producto', 'pedidoCliente', 'usuario']);
         return view('ordenes-compra.show', compact('orden'));
     }
 
-    /**
-     * Formulario de edición
-     */
-    public function edit(OrdenCompra $ordenesCompra)
+    public function edit(OrdenCompra $ordenCompra)
     {
-        $orden = $ordenesCompra;
-        if (!in_array($orden->estado, [OrdenCompra::ESTADO_BORRADOR])) {
+        $orden = $ordenCompra;
+        if ($orden->estado !== OrdenCompra::ESTADO_BORRADOR) {
             return back()->with('error', 'Solo se pueden editar órdenes en borrador');
         }
 
-        $productos = Producto::orderBy('nombre')->get();
+        $productos = Producto::active()->with('categoria')->orderBy('nombre')->get()->groupBy(fn($p) => $p->categoria?->nombre ?? 'Sin Categoría');
         return view('ordenes-compra.edit', compact('orden', 'productos'));
     }
 
-    /**
-     * Actualizar orden
-     */
-    public function update(Request $request, OrdenCompra $ordenesCompra)
+    public function update(Request $request, OrdenCompra $ordenCompra)
     {
-        $orden = $ordenesCompra;
-        if (!in_array($orden->estado, [OrdenCompra::ESTADO_BORRADOR])) {
+        $orden = $ordenCompra;
+        if ($orden->estado !== OrdenCompra::ESTADO_BORRADOR) {
             return back()->with('error', 'Solo se pueden modificar órdenes en borrador');
         }
 
@@ -181,7 +165,6 @@ class OrdenCompraController extends Controller
                 'descuento' => $request->descuento ?? 0,
             ]);
 
-            // Eliminar items anteriores y crear nuevos
             $orden->items()->delete();
 
             foreach ($request->items as $item) {
@@ -193,6 +176,9 @@ class OrdenCompraController extends Controller
                 ]);
             }
 
+            $orden->load('items');
+            $orden->calcularTotales();
+
             DB::commit();
             return redirect()
                 ->route('ordenes-compra.show', $orden)
@@ -200,16 +186,14 @@ class OrdenCompraController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al actualizar la orden: ' . $e->getMessage());
+            Log::error('Error al actualizar orden de compra', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al actualizar la orden. Intente nuevamente.');
         }
     }
 
-    /**
-     * Eliminar orden
-     */
-    public function destroy(OrdenCompra $ordenesCompra)
+    public function destroy(OrdenCompra $ordenCompra)
     {
-        $orden = $ordenesCompra;
+        $orden = $ordenCompra;
         if (!in_array($orden->estado, [OrdenCompra::ESTADO_BORRADOR, OrdenCompra::ESTADO_CANCELADA])) {
             return back()->with('error', 'Solo se pueden eliminar órdenes en borrador o canceladas');
         }
@@ -222,9 +206,6 @@ class OrdenCompraController extends Controller
             ->with('success', "Orden {$numero} eliminada exitosamente");
     }
 
-    /**
-     * Enviar orden al proveedor
-     */
     public function enviar(OrdenCompra $orden)
     {
         if (!$orden->puedeSerEnviada()) {
@@ -238,9 +219,6 @@ class OrdenCompraController extends Controller
             ->with('success', 'Orden marcada como enviada al proveedor');
     }
 
-    /**
-     * Confirmar orden (proveedor confirmó)
-     */
     public function confirmar(OrdenCompra $orden)
     {
         if (!$orden->puedeSerConfirmada()) {
@@ -254,9 +232,6 @@ class OrdenCompraController extends Controller
             ->with('success', 'Orden confirmada por el proveedor');
     }
 
-    /**
-     * Marcar en tránsito
-     */
     public function enTransito(OrdenCompra $orden)
     {
         if ($orden->estado !== OrdenCompra::ESTADO_CONFIRMADA) {
@@ -270,9 +245,6 @@ class OrdenCompraController extends Controller
             ->with('success', 'Orden marcada en tránsito');
     }
 
-    /**
-     * Formulario de recepción de mercadería
-     */
     public function formRecepcion(OrdenCompra $orden)
     {
         if (!$orden->puedeRecibirMercaderia()) {
@@ -283,9 +255,6 @@ class OrdenCompraController extends Controller
         return view('ordenes-compra.recepcion', compact('orden'));
     }
 
-    /**
-     * Registrar recepción de mercadería
-     */
     public function recibirMercaderia(Request $request, OrdenCompra $orden)
     {
         if (!$orden->puedeRecibirMercaderia()) {
@@ -297,42 +266,41 @@ class OrdenCompraController extends Controller
             'cantidades.*' => 'required|numeric|min:0',
         ]);
 
+        $orden->load('items.producto');
+
         DB::beginTransaction();
         try {
-            foreach ($request->cantidades as $itemId => $cantidadRecibida) {
-                $item = OrdenCompraItem::find($itemId);
-                if (!$item || $item->orden_compra_id !== $orden->id) continue;
+            $itemsById = $orden->items->keyBy('id');
 
-                $cantidadAnterior = $item->cantidad_recibida;
-                $nuevaCantidad = $cantidadAnterior + $cantidadRecibida;
+            foreach ($request->cantidades as $itemId => $cantidadRecibida) {
+                $item = $itemsById->get($itemId);
+                if (!$item) continue;
+
+                $cantidadRecibida = (float) $cantidadRecibida;
+                if ($cantidadRecibida <= 0) continue;
+
+                $nuevaCantidad = $item->cantidad_recibida + $cantidadRecibida;
                 $item->update(['cantidad_recibida' => $nuevaCantidad]);
 
-                // Crear movimiento de inventario (ENTRADA)
-                if ($cantidadRecibida > 0) {
-                    $producto = $item->producto;
-                    $stockAnterior = $producto->stock_actual;
-                    $stockNuevo = $stockAnterior + $cantidadRecibida;
+                $producto = $item->producto;
+                $stockAnterior = $producto->stock_actual;
+                $stockNuevo = $stockAnterior + $cantidadRecibida;
 
-                    $producto->update(['stock_actual' => $stockNuevo]);
+                $producto->update(['stock_actual' => $stockNuevo]);
 
-                    MovimientoInventario::create([
-                        'producto_id' => $producto->id,
-                        'tipo' => 'ENTRADA',
-                        'cantidad' => $cantidadRecibida,
-                        'stock_anterior' => $stockAnterior,
-                        'stock_nuevo' => $stockNuevo,
-                        
-                        // CORRECCIÓN: Agregamos las referencias obligatorias
-                        'referencia_tipo' => OrdenCompra::class,
-                        'referencia_id' => $orden->id,
-                        
-                        'usuario_id' => Auth::id(),
-                        'observaciones' => "Recepción de OC {$orden->numero}",
-                    ]);
-                }
+                MovimientoInventario::create([
+                    'producto_id' => $producto->id,
+                    'tipo' => 'ENTRADA',
+                    'cantidad' => $cantidadRecibida,
+                    'stock_anterior' => $stockAnterior,
+                    'stock_nuevo' => $stockNuevo,
+                    'referencia_tipo' => OrdenCompra::class,
+                    'referencia_id' => $orden->id,
+                    'usuario_id' => Auth::id(),
+                    'observaciones' => "Recepción de OC {$orden->numero}",
+                ]);
             }
 
-            // Actualizar estado de la orden
             $orden->refresh();
             if ($orden->verificarRecepcionCompleta()) {
                 $orden->update([
@@ -340,7 +308,6 @@ class OrdenCompraController extends Controller
                     'fecha_recepcion' => now(),
                 ]);
 
-                // Actualizar pedido del cliente si existe
                 if ($orden->pedidoCliente) {
                     $orden->pedidoCliente->update(['estado' => PedidoCliente::ESTADO_MERCADERIA_RECIBIDA]);
                 }
@@ -355,13 +322,11 @@ class OrdenCompraController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al registrar recepción: ' . $e->getMessage());
+            Log::error('Error al registrar recepción', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al registrar recepción. Intente nuevamente.');
         }
     }
 
-    /**
-     * Cancelar orden
-     */
     public function cancelar(Request $request, OrdenCompra $orden)
     {
         if (!$orden->puedeSerCancelada()) {

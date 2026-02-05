@@ -7,10 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Gestión de proveedores por parte de ANKOR
- */
 class ProveedorController extends Controller
 {
     public function index(Request $request)
@@ -42,7 +40,7 @@ class ProveedorController extends Controller
             'razon_social' => 'required|string|max:255',
             'ruc' => 'required|string|max:50|unique:proveedores,ruc',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
             'telefono' => 'nullable|string|max:50',
             'direccion' => 'nullable|string|max:500',
             'ciudad' => 'nullable|string|max:100',
@@ -78,28 +76,27 @@ class ProveedorController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al crear proveedor: ' . $e->getMessage());
+            Log::error('Error al crear proveedor', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al crear proveedor. Intente nuevamente.');
         }
     }
 
-    public function show(Proveedor $proveedore)
+    public function show(Proveedor $proveedor)
     {
-        $proveedor = $proveedore->load(['user', 'solicitudesPresupuesto' => function ($q) {
+        $proveedor->load(['user', 'solicitudesPresupuesto' => function ($q) {
             $q->latest()->take(10);
         }]);
 
         return view('proveedores.show', compact('proveedor'));
     }
 
-    public function edit(Proveedor $proveedore)
+    public function edit(Proveedor $proveedor)
     {
-        return view('proveedores.edit', ['proveedor' => $proveedore]);
+        return view('proveedores.edit', compact('proveedor'));
     }
 
-    public function update(Request $request, Proveedor $proveedore)
+    public function update(Request $request, Proveedor $proveedor)
     {
-        $proveedor = $proveedore;
-
         $request->validate([
             'razon_social' => 'required|string|max:255',
             'ruc' => 'required|string|max:50|unique:proveedores,ruc,' . $proveedor->id,
@@ -113,7 +110,6 @@ class ProveedorController extends Controller
             'razon_social', 'ruc', 'telefono', 'direccion', 'ciudad', 'rubros'
         ]));
 
-        // Actualizar nombre del usuario
         $proveedor->user->update(['name' => $request->razon_social]);
 
         return redirect()
@@ -121,9 +117,8 @@ class ProveedorController extends Controller
             ->with('success', 'Proveedor actualizado');
     }
 
-    public function destroy(Proveedor $proveedore)
+    public function destroy(Proveedor $proveedor)
     {
-        $proveedor = $proveedore;
         $nombre = $proveedor->razon_social;
 
         // El usuario se elimina en cascada

@@ -1,201 +1,53 @@
+/* ============================================
+   ANKOR ERP - Main Stylesheet
+   ============================================
+
+   Structure:
+   ├── base/       → Fonts, theme, reset
+   ├── layout/     → Navbar, page structure
+   ├── components/ → Buttons, forms, cards, etc.
+   └── utilities/  → Helper classes
+
+   ============================================ */
+
+/* Google Fonts - Must be first */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* Tailwind CSS */
 @import 'tailwindcss';
 
+/* Source paths for Tailwind to scan */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}
+/* ============================================
+   BASE
+   ============================================ */
+@import './base/_fonts.css';
+@import './base/_reset.css';
 
 /* ============================================
-   SISTEMA DE ESTILOS - FORMULARIOS
+   LAYOUT
    ============================================ */
-
-/* Input base - usado en todos los campos de formulario */
-.form-input {
-    @apply w-full px-4 py-2.5
-           bg-white
-           border-2 border-gray-600
-           rounded-lg
-           text-gray-900
-           placeholder-gray-400
-           transition-all duration-200
-           focus:bg-white
-           focus:border-blue-600
-           focus:ring-2
-           focus:ring-blue-200
-           focus:outline-none;
-}
-
-.form-input:hover:not(:focus) {
-    @apply border-gray-800 bg-gray-50;
-}
-
-/* Select con mismo estilo */
-.form-select {
-    @apply w-full px-4 py-2.5
-           bg-white
-           border-2 border-gray-600
-           rounded-lg
-           text-gray-900
-           transition-all duration-200
-           focus:bg-white
-           focus:border-blue-600
-           focus:ring-2
-           focus:ring-blue-200
-           focus:outline-none
-           cursor-pointer;
-}
-
-.form-select:hover:not(:focus) {
-    @apply border-gray-800 bg-gray-50;
-}
-
-/* Textarea */
-.form-textarea {
-    @apply w-full px-4 py-3
-           bg-white
-           border-2 border-gray-600
-           rounded-lg
-           text-gray-900
-           placeholder-gray-400
-           transition-all duration-200
-           focus:bg-white
-           focus:border-blue-600
-           focus:ring-2
-           focus:ring-blue-200
-           focus:outline-none
-           resize-y;
-}
-
-.form-textarea:hover:not(:focus) {
-    @apply border-gray-800 bg-gray-50;
-}
-
-/* Label */
-.form-label {
-    @apply block text-sm font-bold text-gray-800 mb-2;
-}
-
-.form-label-required::after {
-    content: ' *';
-    @apply text-red-600;
-}
-
-/* Grupo de campo (label + input) */
-.form-group {
-    @apply mb-4;
-}
-
-/* Card/Seccion de formulario */
-.form-section {
-    @apply bg-white rounded-xl shadow-lg p-6 border-2 border-gray-300;
-}
-
-.form-section-title {
-    @apply text-xl font-bold text-gray-900 mb-5 pb-3 border-b-2 border-gray-300;
-}
-
-/* Estados de error */
-.form-input-error {
-    @apply border-red-600 bg-red-50 focus:border-red-600 focus:ring-red-200;
-}
-
-.form-error-message {
-    @apply text-red-600 text-sm mt-1 font-medium;
-}
-
-/* Input con icono */
-.form-input-icon-wrapper {
-    @apply relative;
-}
-
-.form-input-icon-wrapper .form-input {
-    @apply pl-10;
-}
-
-.form-input-icon {
-    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5;
-}
-
-/* Input numerico alineado a la derecha */
-.form-input-number {
-    @apply w-full px-4 py-2.5
-           bg-white
-           border-2 border-gray-600
-           rounded-lg
-           text-gray-900
-           text-right font-mono
-           transition-all duration-200
-           focus:bg-white
-           focus:border-blue-600
-           focus:ring-2
-           focus:ring-blue-200
-           focus:outline-none;
-}
-
-/* Botones de formulario */
-.btn-primary {
-    @apply bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold
-           hover:bg-blue-700 active:bg-blue-800
-           transition-all duration-200
-           shadow-md hover:shadow-lg
-           border-2 border-blue-700;
-}
-
-.btn-secondary {
-    @apply bg-gray-100 text-gray-800 px-6 py-2.5 rounded-lg font-bold
-           hover:bg-gray-200 active:bg-gray-300
-           transition-all duration-200
-           border-2 border-gray-400;
-}
-
-.btn-success {
-    @apply bg-green-600 text-white px-6 py-2.5 rounded-lg font-bold
-           hover:bg-green-700 active:bg-green-800
-           transition-all duration-200
-           shadow-md hover:shadow-lg
-           border-2 border-green-700;
-}
-
-.btn-danger {
-    @apply bg-red-600 text-white px-6 py-2.5 rounded-lg font-bold
-           hover:bg-red-700 active:bg-red-800
-           transition-all duration-200
-           border-2 border-red-700;
-}
+@import './layout/_navbar.css';
+@import './layout/_page.css';
 
 /* ============================================
-   SISTEMA DE ESTILOS - TABLAS
+   COMPONENTS
    ============================================ */
-.table-container {
-    @apply overflow-x-auto rounded-lg border-2 border-gray-400 shadow-lg;
-}
+@import './components/_buttons.css';
+@import './components/_forms.css';
+@import './components/_cards.css';
+@import './components/_tables.css';
+@import './components/_badges.css';
+@import './components/_stepper.css';
+@import './components/_panels.css';
+@import './components/_price.css';
+@import './components/_tooltips.css';
 
-.data-table {
-    @apply min-w-full divide-y-2 divide-gray-400;
-}
-
-.data-table thead {
-    @apply bg-gradient-to-r from-gray-800 to-gray-900;
-}
-
-.data-table th {
-    @apply px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider
-           border-r border-gray-600 last:border-r-0;
-}
-
-.data-table tbody {
-    @apply bg-white divide-y divide-gray-300;
-}
-
-.data-table tbody tr {
-    @apply hover:bg-blue-50 transition-colors;
-}
-
-.data-table td {
-    @apply px-4 py-3 text-sm text-gray-800 border-r border-gray-200 last:border-r-0;
-}
+/* ============================================
+   UTILITIES
+   ============================================ */
+@import './utilities/_utilities.css';

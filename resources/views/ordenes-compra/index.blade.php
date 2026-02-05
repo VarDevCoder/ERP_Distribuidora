@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Ordenes de Compra</h1>
-            <p class="text-gray-600 mt-1">Flujo ANKOR - Gestiona las compras a proveedores</p>
+            <h1 class="page-title">Ordenes de Compra</h1>
+            <p class="page-subtitle">Gestiona las compras a proveedores</p>
         </div>
         <a href="{{ route('ordenes-compra.create') }}" class="btn-primary">
             + Nueva Orden
@@ -46,7 +46,7 @@
                 <tr>
                     <th>Numero</th>
                     <th>Proveedor</th>
-                    <th>Pedido Cliente</th>
+                    <th>Solicitud</th>
                     <th>Fecha</th>
                     <th>Estado</th>
                     <th class="text-right">Total</th>

@@ -40,6 +40,11 @@ class Proveedor extends Model
         return $this->hasMany(OrdenCompra::class);
     }
 
+    public function proveedorProductos(): HasMany
+    {
+        return $this->hasMany(ProveedorProducto::class);
+    }
+
     /**
      * Solicitudes pendientes de respuesta
      */

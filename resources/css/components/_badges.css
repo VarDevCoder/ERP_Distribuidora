@@ -1,0 +1,44 @@
+/* ============================================
+   BADGES - Subtle & Professional
+   ============================================ */
+
+.badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1
+           rounded-lg text-xs font-semibold
+           transition-all duration-200;
+}
+
+/* Badge variants */
+.badge-info {
+    @apply bg-sky-50 text-sky-700 ring-1 ring-sky-200;
+}
+
+.badge-success {
+    @apply bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200;
+}
+
+.badge-warning {
+    @apply bg-amber-50 text-amber-700 ring-1 ring-amber-200;
+}
+
+.badge-danger {
+    @apply bg-rose-50 text-rose-700 ring-1 ring-rose-200;
+}
+
+.badge-neutral {
+    @apply bg-slate-100 text-slate-600 ring-1 ring-slate-200;
+}
+
+.badge-secondary {
+    @apply bg-slate-100 text-slate-600;
+}
+
+/* Status indicator dot */
+.badge-dot::before {
+    content: '';
+    @apply w-1.5 h-1.5 rounded-full bg-current;
+}
+
+.badge-dot-pulse::before {
+    @apply animate-pulse;
+}

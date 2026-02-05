@@ -12,16 +12,10 @@ use App\Models\OrdenCompraItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Controlador para colaboradores de ANKOR
- * Gestiona solicitudes de presupuesto a proveedores
- */
 class SolicitudPresupuestoController extends Controller
 {
-    /**
-     * Listar todas las solicitudes
-     */
     public function index(Request $request)
     {
         $query = SolicitudPresupuesto::with(['proveedor', 'pedidoCliente', 'usuario'])
@@ -41,13 +35,10 @@ class SolicitudPresupuestoController extends Controller
         return view('solicitudes-presupuesto.index', compact('solicitudes', 'proveedores'));
     }
 
-    /**
-     * Formulario de creación
-     */
     public function create(Request $request)
     {
         $proveedores = Proveedor::orderBy('razon_social')->get();
-        $productos = Producto::orderBy('nombre')->get();
+        $productos = Producto::active()->with('categoria')->orderBy('nombre')->get()->groupBy(fn($p) => $p->categoria?->nombre ?? 'Sin Categoría');
         $pedidoCliente = null;
 
         if ($request->filled('pedido_cliente_id')) {
@@ -57,9 +48,6 @@ class SolicitudPresupuestoController extends Controller
         return view('solicitudes-presupuesto.create', compact('proveedores', 'productos', 'pedidoCliente'));
     }
 
-    /**
-     * Guardar nueva solicitud
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -91,7 +79,6 @@ class SolicitudPresupuestoController extends Controller
                 ]);
             }
 
-            // Actualizar estado del pedido cliente si existe
             if ($request->pedido_cliente_id) {
                 $pedido = PedidoCliente::find($request->pedido_cliente_id);
                 if ($pedido && $pedido->estado === PedidoCliente::ESTADO_EN_PROCESO) {
@@ -106,22 +93,31 @@ class SolicitudPresupuestoController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al crear solicitud: ' . $e->getMessage());
+            Log::error('Error al crear solicitud de presupuesto', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al crear la solicitud. Intente nuevamente.');
         }
     }
 
-    /**
-     * Ver detalle de solicitud
-     */
-    public function show(SolicitudPresupuesto $solicitudesPresupuesto)
+    public function show(SolicitudPresupuesto $solicitud)
     {
-        $solicitud = $solicitudesPresupuesto->load(['items.producto', 'proveedor', 'pedidoCliente', 'usuario']);
+        $solicitud->load(['items.producto', 'proveedor', 'pedidoCliente', 'usuario']);
         return view('solicitudes-presupuesto.show', compact('solicitud'));
     }
 
-    /**
-     * Aceptar cotización y crear orden de compra
-     */
+    public function destroy(SolicitudPresupuesto $solicitud)
+    {
+        if ($solicitud->estado !== SolicitudPresupuesto::ESTADO_ENVIADA) {
+            return back()->with('error', 'Solo se pueden eliminar solicitudes en estado enviada');
+        }
+
+        $numero = $solicitud->numero;
+        $solicitud->delete();
+
+        return redirect()
+            ->route('solicitudes-presupuesto.index')
+            ->with('success', "Solicitud {$numero} eliminada exitosamente");
+    }
+
     public function aceptar(SolicitudPresupuesto $solicitud)
     {
         if (!$solicitud->puedeSerAceptada()) {
@@ -130,7 +126,6 @@ class SolicitudPresupuestoController extends Controller
 
         DB::beginTransaction();
         try {
-            // Crear orden de compra automáticamente
             $proveedor = $solicitud->proveedor;
 
             $orden = OrdenCompra::create([
@@ -140,7 +135,7 @@ class SolicitudPresupuestoController extends Controller
                 'proveedor_telefono' => $proveedor->telefono,
                 'proveedor_email' => $proveedor->user->email,
                 'proveedor_direccion' => $proveedor->direccion,
-                'presupuesto_proveedor_id' => null, // No hay presupuesto legacy
+                'presupuesto_proveedor_id' => null,
                 'fecha_orden' => now(),
                 'fecha_entrega_esperada' => now()->addDays($solicitud->dias_entrega_estimados ?? 7),
                 'estado' => OrdenCompra::ESTADO_BORRADOR,
@@ -148,7 +143,6 @@ class SolicitudPresupuestoController extends Controller
                 'usuario_id' => Auth::id(),
             ]);
 
-            // Copiar items de la cotización
             foreach ($solicitud->items as $item) {
                 if ($item->tiene_stock && $item->cantidad_disponible > 0) {
                     OrdenCompraItem::create([
@@ -162,10 +156,8 @@ class SolicitudPresupuestoController extends Controller
 
             $orden->calcularTotales();
 
-            // Actualizar solicitud
             $solicitud->update(['estado' => SolicitudPresupuesto::ESTADO_ACEPTADA]);
 
-            // Actualizar pedido cliente
             if ($solicitud->pedidoCliente) {
                 $solicitud->pedidoCliente->update(['estado' => PedidoCliente::ESTADO_ORDEN_COMPRA]);
             }
@@ -177,13 +169,11 @@ class SolicitudPresupuestoController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al aceptar cotización: ' . $e->getMessage());
+            Log::error('Error al aceptar cotización', ['exception' => $e->getMessage()]);
+            return back()->with('error', 'Error al aceptar la cotización. Intente nuevamente.');
         }
     }
 
-    /**
-     * Rechazar cotización
-     */
     public function rechazar(Request $request, SolicitudPresupuesto $solicitud)
     {
         if (!$solicitud->puedeSerAceptada()) {
