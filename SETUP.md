@@ -20,6 +20,106 @@
 - Node.js >= 18
 - npm >= 9
 
+---
+
+## Instalación en Windows (Paso a Paso)
+
+### 1. Instalar PHP 8.2+
+
+**Opción A: XAMPP (Recomendado para principiantes)**
+```powershell
+# Descargar XAMPP desde https://www.apachefriends.org/
+# Incluye PHP, Apache y MySQL
+# PHP estará en: C:\xampp\php\php.exe
+```
+
+**Opción B: PHP Directo**
+```powershell
+# Descargar desde https://windows.php.net/download/
+# Extraer en C:\php
+# Agregar C:\php al PATH del sistema
+```
+
+### 2. Instalar Composer (NO usar winget)
+
+```powershell
+# Método 1: Instalador oficial (RECOMENDADO)
+# Descargar desde: https://getcomposer.org/Composer-Setup.exe
+# Ejecutar el instalador y seguir los pasos
+
+# Método 2: Vía PHP (si el instalador falla)
+cd C:\Users\TuUsuario
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+# Mover composer.phar a un lugar accesible y crear composer.bat
+move composer.phar C:\php\composer.phar
+echo @php "%~dp0composer.phar" %* > C:\php\composer.bat
+```
+
+### 3. Instalar Node.js
+
+```powershell
+# Opción A: Descargar instalador desde https://nodejs.org/
+# Elegir versión LTS (18.x o superior)
+
+# Opción B: Via winget (esto SÍ funciona)
+winget install OpenJS.NodeJS.LTS
+```
+
+### 4. Verificar instalaciones
+
+```powershell
+php -v          # Debe mostrar PHP 8.2+
+composer -V     # Debe mostrar Composer 2.x
+node -v         # Debe mostrar v18+
+npm -v          # Debe mostrar 9+
+```
+
+### 5. Clonar y configurar el proyecto
+
+```powershell
+# Clonar repositorio
+git clone https://github.com/VarDevCoder/ERP_Distribuidora.git
+cd ERP_Distribuidora
+
+# Instalar dependencias PHP
+composer install
+
+# Copiar archivo de entorno
+copy .env.example .env
+
+# Generar clave de aplicación
+php artisan key:generate
+
+# Crear base de datos SQLite (Windows)
+type nul > database\database.sqlite
+
+# Ejecutar migraciones con datos de prueba
+php artisan migrate --seed
+
+# Instalar dependencias Node
+npm install
+
+# Compilar assets
+npm run build
+
+# Iniciar servidor
+php artisan serve
+```
+
+### 6. Acceder al sistema
+
+Abrir en el navegador: `http://localhost:8000`
+
+**Credenciales de prueba:**
+- Admin: `admin@ankhor.com` / `password`
+- Usuario: `usuario@ankhor.com` / `password`
+
+---
+
+## Instalación en Linux/Mac
+
 ### Pasos de Instalación
 
 ```bash
