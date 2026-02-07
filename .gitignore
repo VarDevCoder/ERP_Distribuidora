@@ -1,27 +1,63 @@
-*.log
-.DS_Store
-.env
-.env.backup
-.env.local
-.env.production
-.env.supabase
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
+# Laravel
+/vendor
 /node_modules
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
 /storage/pail
-/vendor
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# Storage (cache, logs, sessions)
+/storage/app/*
+!/storage/app/.gitkeep
+!/storage/app/public
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE & Editors
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.zed
+/.history
+*.sublime-project
+*.sublime-workspace
+
+# Claude Code
+/.claude
+.claude/settings.local.json
+
+# PHP & Composer
+/auth.json
+.phpactor.json
+.phpunit.result.cache
+/.phpunit.cache
+php_errors.log
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+nul
+
+# Testing
+/coverage
+.phpunit.result.cache
+
+# Misc
 Homestead.json
 Homestead.yaml
-Thumbs.db
-.claude/settings.local.json
+npm-debug.log
+yarn-error.log

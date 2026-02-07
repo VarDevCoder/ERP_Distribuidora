@@ -37,6 +37,7 @@
                         <x-nav-link :href="route('ordenes-envio.index')" :active="request()->routeIs('ordenes-envio.*')">Envíos</x-nav-link>
                         <span class="w-px h-6 bg-blue-600"></span>
                         <x-nav-link :href="route('proveedores.index')" :active="request()->routeIs('proveedores.*')">Proveedores</x-nav-link>
+                        <x-nav-link :href="route('catalogo-proveedores.index')" :active="request()->routeIs('catalogo-proveedores.*')">Catálogo Prov.</x-nav-link>
                         <x-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">Clientes</x-nav-link>
                         <x-nav-link :href="route('analisis-proveedores.index')" :active="request()->routeIs('analisis-proveedores.*')">Análisis</x-nav-link>
                         <x-nav-link :href="route('inventario.index')" :active="request()->routeIs('inventario.*')">Inventario</x-nav-link>
@@ -102,6 +103,7 @@
                     <x-mobile-nav-link :href="route('ordenes-envio.index')" :active="request()->routeIs('ordenes-envio.*')">Envíos</x-mobile-nav-link>
                     <div class="border-t border-blue-700 my-2"></div>
                     <x-mobile-nav-link :href="route('proveedores.index')" :active="request()->routeIs('proveedores.*')">Proveedores</x-mobile-nav-link>
+                    <x-mobile-nav-link :href="route('catalogo-proveedores.index')" :active="request()->routeIs('catalogo-proveedores.*')">Catálogo Proveedores</x-mobile-nav-link>
                     <x-mobile-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">Clientes</x-mobile-nav-link>
                     <x-mobile-nav-link :href="route('analisis-proveedores.index')" :active="request()->routeIs('analisis-proveedores.*')">Análisis Proveedores</x-mobile-nav-link>
                     <x-mobile-nav-link :href="route('inventario.index')" :active="request()->routeIs('inventario.*')">Inventario</x-mobile-nav-link>

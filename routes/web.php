@@ -16,6 +16,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnalisisProveedoresController;
+use App\Http\Controllers\CatalogoProveedorController;
 
 // Authentication Routes
 Route::get('/', function () {
@@ -73,6 +74,17 @@ Route::middleware('auth')->group(function () {
         Route::resource('proveedores', ProveedorController::class)
             ->parameters(['proveedores' => 'proveedor']);
         Route::post('proveedores/{proveedor}/toggle-activo', [ProveedorController::class, 'toggleActivo'])->name('proveedores.toggle-activo');
+
+        // CATÁLOGO DE PRODUCTOS POR PROVEEDOR (Admin gestiona todo)
+        Route::resource('catalogo-proveedores', CatalogoProveedorController::class)
+            ->parameters(['catalogo-proveedores' => 'catalogoProveedor'])
+            ->except(['show']);
+        Route::post('catalogo-proveedores/{catalogoProveedor}/toggle-disponible', [CatalogoProveedorController::class, 'toggleDisponible'])
+            ->name('catalogo-proveedores.toggle-disponible');
+        Route::post('catalogo-proveedores/cargar-masivo', [CatalogoProveedorController::class, 'cargarMasivo'])
+            ->name('catalogo-proveedores.cargar-masivo');
+        Route::get('catalogo-proveedores/productos-disponibles/{proveedor}', [CatalogoProveedorController::class, 'productosDisponibles'])
+            ->name('catalogo-proveedores.productos-disponibles');
 
         // GESTIÓN DE CLIENTES
         Route::resource('clientes', ClienteController::class);
